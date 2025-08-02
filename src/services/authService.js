@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; 
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -17,7 +18,6 @@ const login = async (email, password) => {
     password,
   });
   if (response.data.token) {
-    // Store the token in the browser's local storage for persistence
     localStorage.setItem('userToken', response.data.token);
   }
   return response.data;
@@ -31,11 +31,30 @@ const getCurrentUserToken = () => {
   return localStorage.getItem('userToken');
 };
 
+const getCurrentUser = () => {
+  const token = localStorage.getItem('userToken');
+  if (!token) {
+    return null;
+  }
+  try {
+    const decodedToken = jwtDecode(token);
+    return {
+      email: decodedToken.sub,
+      roles: decodedToken.authorities || [],
+    };
+  } catch (error) {
+    console.error("Invalid token", error);
+    return null;
+  }
+};
+
+
 const authService = {
   register,
   login,
   logout,
   getCurrentUserToken,
+  getCurrentUser
 };
 
 export default authService;

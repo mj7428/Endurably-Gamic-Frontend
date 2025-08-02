@@ -6,10 +6,14 @@ import Header from './components/Header';
 import BaseLayoutGrid from './components/BaseLayoutGrid';
 import Login from './components/Login';
 import Register from './components/Register';
-import SubmitBase from './components/SubmitBase'; // 1. Import the new component
-import authService from './services/authService';
+import SubmitBase from './components/SubmitBase';
+import TournamentsPage from './components/TournamentsPage';
+import { useAuth } from './context/AuthContext';
+import CreateTournamentPage from './components/CreateTournamentPage';
+import TournamentDetailPage from './components/TournamentDetailPage';
+import TournamentRegistrationsPage from './components/TournamentRegistrationsPage'; // Import the admin view page
 
-// Replace with your EC2 instance's current Public IP address.
+
 const API_BASE_URL = 'http://localhost:8080'; 
 
 function App() {
@@ -17,8 +21,9 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTownHall, setActiveTownHall] = useState(15);
-  const [currentUserToken, setCurrentUserToken] = useState(authService.getCurrentUserToken());
   const [currentPage, setCurrentPage] = useState('home');
+  const { user, login, logout } = useAuth(); 
+  const [activeTournamentId, setActiveTournamentId] = useState(null);
 
   useEffect(() => {
     const fetchLayouts = async () => {
@@ -41,45 +46,63 @@ function App() {
   }, [activeTownHall, currentPage]);
 
   const handleLoginSuccess = () => {
-    setCurrentUserToken(authService.getCurrentUserToken());
+    login(); 
     setCurrentPage('home');
   };
 
   const handleLogout = () => {
-    authService.logout();
-    setCurrentUserToken(null);
+    logout(); 
     setCurrentPage('home');
   };
 
-  const renderPage = () => {
-    if (currentPage === 'login') {
-      return <Login onLoginSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />;
-    }
-    if (currentPage === 'register') {
-      return <Register onNavigate={setCurrentPage} />;
-    }
-    // 2. Add the case for the submit page
-    if (currentPage === 'submit') {
-      return <SubmitBase onNavigate={setCurrentPage} />;
-    }
-    
-    // Default to home page
-    return (
-      <>
-        <Header activeTownHall={activeTownHall} setActiveTownHall={setActiveTownHall} />
-        <main className="container mx-auto px-4 py-8">
-          <BaseLayoutGrid layouts={layouts} loading={loading} error={error} apiBaseUrl={API_BASE_URL} />
-        </main>
-      </>
-    );
+  const navigateTo = (page) => {
+    setActiveTournamentId(null); 
+    setCurrentPage(page);
   };
+
+  const viewTournamentDetails = (id) => {
+    setActiveTournamentId(id);
+    if (user && user.roles.includes('ROLE_ADMIN')) {
+      setCurrentPage('view-registrations');
+    } else {
+      setCurrentPage('tournament-detail');
+    }
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'login':
+        return <Login onLoginSuccess={handleLoginSuccess} onNavigate={navigateTo} />;
+      case 'register':
+        return <Register onNavigate={navigateTo} />;
+      case 'submit':
+        return <SubmitBase />;
+      case 'tournaments':
+        return <TournamentsPage onNavigate={navigateTo} onViewDetails={viewTournamentDetails} />;
+      case 'create-tournament':
+        return <CreateTournamentPage onNavigate={navigateTo}/>;
+      case 'tournament-detail':
+        return <TournamentDetailPage tournamentId={activeTournamentId} onNavigate={navigateTo} />;
+      case 'view-registrations':
+        return <TournamentRegistrationsPage tournamentId={activeTournamentId} />;
+      default:
+        return (
+          <>
+            <Header activeTownHall={activeTownHall} setActiveTownHall={setActiveTownHall} />
+            <main className="container mx-auto px-4 py-8">
+              <BaseLayoutGrid layouts={layouts} loading={loading} error={error} apiBaseUrl={API_BASE_URL} />
+            </main>
+          </>
+        );
+    }
+  };
+
 
   return (
     <div className="bg-gray-900 min-h-screen text-gray-200 font-sans">
       <Navbar 
-        userToken={currentUserToken} 
         onLogout={handleLogout}
-        onNavigate={setCurrentPage}
+        onNavigate={navigateTo} // Use navigateTo for general navigation
       />
       {renderPage()}
     </div>

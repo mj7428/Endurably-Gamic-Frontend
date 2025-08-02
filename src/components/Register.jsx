@@ -4,6 +4,7 @@ import React,
 }
 from 'react';
 import authService from '../services/authService';
+import registerImage from '../assets/registerfor.png';
 
 const Register = ({
     onNavigate
@@ -37,7 +38,7 @@ const Register = ({
 
     return (
         <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
-            <div className="max-w-4xl w-full grid md:grid-cols-2 bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="max-w-6xl w-full grid md:grid-cols-2 bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
                 
                 <div className="p-8 md:p-12 flex flex-col justify-center">
                     <h2 className="text-3xl font-bold text-white mb-2">Create an Account</h2>
@@ -103,7 +104,7 @@ const Register = ({
 
                 <div className="hidden md:block">
                     <img
-                        src="https://images.pexels.com/photos/270632/pexels-photo-270632.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                        src={registerImage}
                         alt="Gaming Setup"
                         className="w-full h-full object-cover"
                     />

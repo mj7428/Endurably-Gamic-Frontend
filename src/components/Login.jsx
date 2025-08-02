@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import authService from '../services/authService';
+import loginImage from '../assets/loginfinal.png';
 
 const Login = ({ onLoginSuccess, onNavigate }) => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ const Login = ({ onLoginSuccess, onNavigate }) => {
 
     try {
       await authService.login(email, password);
-      onLoginSuccess(); // Notify App.jsx that login was successful
+      onLoginSuccess(); 
     } catch (err) {
       setError('Failed to log in. Please check your credentials.');
       console.error(err);
@@ -30,7 +31,7 @@ const Login = ({ onLoginSuccess, onNavigate }) => {
         {/* Left Side: Image */}
         <div className="hidden md:block">
           <img
-            src="https://images.pexels.com/photos/1670187/pexels-photo-1670187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+            src={loginImage}
             alt="Fantasy Castle"
             className="w-full h-full object-cover"
           />
