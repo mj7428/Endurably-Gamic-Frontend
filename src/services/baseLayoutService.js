@@ -1,10 +1,7 @@
 import axios from 'axios';
 import authService from './authService';
+import { API_BASE_URL } from '../config'; 
 
-// Replace with your EC2 instance's current Public IP address.
-const API_BASE_URL = 'http://localhost:8080';
-
-// Helper function to get the authentication headers with the JWT
 const getAuthHeaders = () => {
   const token = authService.getCurrentUserToken();
   if (token) {
@@ -13,7 +10,6 @@ const getAuthHeaders = () => {
   return {};
 };
 
-// Function for submitting a new base with an image
 const createBase = (title, townhallLevel, baseLink, imageFile) => {
   const formData = new FormData();
   formData.append('title', title);

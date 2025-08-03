@@ -12,9 +12,7 @@ import { useAuth } from './context/AuthContext';
 import CreateTournamentPage from './components/CreateTournamentPage';
 import TournamentDetailPage from './components/TournamentDetailPage';
 import TournamentRegistrationsPage from './components/TournamentRegistrationsPage'; // Import the admin view page
-
-
-const API_BASE_URL = 'http://localhost:8080'; 
+import { API_BASE_URL } from './config'; 
 
 function App() {
   const [layouts, setLayouts] = useState([]);

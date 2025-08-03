@@ -37,11 +37,11 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         setError('');
         setSuccess('');
 
+        // This logic correctly builds the complex DTO structure
         const registrationData = {
             teamFields: [],
             playerSubmissions: []
         };
-
         const playersMap = {};
 
         tournament.requiredFields.forEach(field => {
@@ -68,8 +68,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
 
         registrationData.playerSubmissions = Object.values(playersMap);
 
-        console.log("---------registration data-------",registrationData);
-
         try {
             await tournamentService.registerTeam(tournamentId, registrationData);
             setSuccess('Your team has been registered successfully!');
@@ -84,15 +82,31 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     if (loading) return <p className="text-center text-xl p-8">Loading Tournament...</p>;
     if (error && !tournament) return <p className="text-center text-xl text-red-500 p-8">{error}</p>;
 
+    // ✅ Check if the tournament has already started
+    const isTournamentFinished = new Date(tournament.startDate) < new Date();
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="bg-gray-800 rounded-lg shadow-lg p-8">
                 <h2 className="text-3xl font-bold text-white mb-2">{tournament.name}</h2>
                 <p className="text-gray-400 mb-6">{tournament.rules}</p>
                 
-                <h3 className="text-2xl font-bold text-white mb-4 border-t border-gray-700 pt-6">Registration Form</h3>
+                <h3 className="text-2xl font-bold text-white mb-4 border-t border-gray-700 pt-6">Registration</h3>
                 
-                {user ? (
+                {/* Conditionally render the correct UI based on login status and tournament date */}
+                {!user ? (
+                    <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
+                        <p>You must be logged in to register for this tournament.</p>
+                        <button onClick={() => onNavigate('login')} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                            Login
+                        </button>
+                    </div>
+                ) : isTournamentFinished ? (
+                    <div className="text-center text-yellow-400 bg-yellow-900/50 border border-yellow-700 p-8 rounded-lg">
+                        <p className="font-bold text-lg">Registrations for this tournament have closed.</p>
+                        <p>The event has already started or is finished.</p>
+                    </div>
+                ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {tournament.requiredFields.map(field => (
                             <div key={field.id}>
@@ -116,13 +130,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                             {loading ? 'Submitting...' : 'Register Team'}
                         </button>
                     </form>
-                ) : (
-                    <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
-                        <p>You must be logged in to register for this tournament.</p>
-                        <button onClick={() => onNavigate('login')} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-                            Login
-                        </button>
-                    </div>
                 )}
             </div>
         </div>

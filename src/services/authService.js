@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode'; 
+import { API_BASE_URL } from '../config'; 
 
-const API_BASE_URL = 'http://localhost:8080';
 
 const register = (name, email, password, role) => {
   return axios.post(`${API_BASE_URL}/user`, {

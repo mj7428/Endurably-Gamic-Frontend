@@ -1,7 +1,6 @@
 import axios from 'axios';
 import authService from './authService';
-
-const API_BASE_URL = 'http://localhost:8080';
+import { API_BASE_URL } from '../config'; 
 
 const getAuthHeaders = () => {
   const token = authService.getCurrentUserToken();
