@@ -1,0 +1,8 @@
+# This rule tells Netlify to proxy all requests starting with /api
+# to your EC2 server.
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://13.233.68.227/:splat"
+  status = 200
+  force = true
