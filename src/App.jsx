@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 
 import Navbar from './components/Navbar';
@@ -11,26 +11,61 @@ import TournamentsPage from './components/TournamentsPage';
 import { useAuth } from './context/AuthContext';
 import CreateTournamentPage from './components/CreateTournamentPage';
 import TournamentDetailPage from './components/TournamentDetailPage';
-import TournamentRegistrationsPage from './components/TournamentRegistrationsPage'; // Import the admin view page
+import TournamentRegistrationsPage from './components/TournamentRegistrationsPage';
 import { API_BASE_URL } from './config'; 
+import baseLayoutService from './services/baseLayoutService';
 
 function App() {
-  const [layouts, setLayouts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [activeTownHall, setActiveTownHall] = useState(15);
   const [currentPage, setCurrentPage] = useState('home');
   const { user, login, logout } = useAuth(); 
   const [activeTournamentId, setActiveTournamentId] = useState(null);
 
+  // --- State for Homepage Content ---
+  const [layouts, setLayouts] = useState([]);
+  const [activeTownHall, setActiveTownHall] = useState(15);
+  
+  // --- State for Infinite Scroll ---
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // --- IntersectionObserver for Infinite Scroll ---
+  const observer = useRef();
+  const lastBaseElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setPage(prevPage => prevPage + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore]);
+
+  // --- Effect to reset the list when filters change ---
   useEffect(() => {
+    // When the town hall filter changes, reset everything to start a new search
+    setLayouts([]);
+    setPage(0);
+    setHasMore(true);
+  }, [activeTownHall]);
+
+  // --- Effect to fetch data when page or filters change ---
+  useEffect(() => {
+    // Don't fetch if not on the home page or if there's no more data
+    if (currentPage !== 'home' || !hasMore) return;
+
     const fetchLayouts = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const params = new URLSearchParams({ page: 0, size: 10, sort: 'id,desc', townhallLevel: activeTownHall });
-        const response = await axios.get(`${API_BASE_URL}/bases?${params.toString()}`);
-        setLayouts(response.data.content);
-        setError(null);
+        // Use the baseLayoutService to fetch data
+        const response = await baseLayoutService.getAll({ page, size: 8 }, activeTownHall);
+        // Append new layouts to the existing list
+        setLayouts(prevLayouts => [...prevLayouts, ...response.data.content]);
+        // Check if this was the last page
+        setHasMore(!response.data.last);
       } catch (err) {
         setError('Failed to fetch base layouts. Is the server running?');
         console.error(err);
@@ -38,29 +73,18 @@ function App() {
         setLoading(false);
       }
     };
-    if (currentPage === 'home') {
-        fetchLayouts();
-    }
-  }, [activeTownHall, currentPage]);
+    
+    fetchLayouts();
+  }, [page, activeTownHall, currentPage]); // Re-run when page or filter changes
 
-  const handleLoginSuccess = () => {
-    login(); 
-    setCurrentPage('home');
-  };
 
-  const handleLogout = () => {
-    logout(); 
-    setCurrentPage('home');
-  };
-
-  const navigateTo = (page) => {
-    setActiveTournamentId(null); 
-    setCurrentPage(page);
-  };
-
+  // --- Event Handlers ---
+  const handleLoginSuccess = () => { login(); setCurrentPage('home'); };
+  const handleLogout = () => { logout(); setCurrentPage('home'); };
+  const navigateTo = (page) => { setActiveTournamentId(null); setCurrentPage(page); };
   const viewTournamentDetails = (id) => {
     setActiveTournamentId(id);
-    if (user && user.roles.includes('ROLE_ADMIN')) {
+    if (user && user.roles.includes('ROLE_Admin')) {
       setCurrentPage('view-registrations');
     } else {
       setCurrentPage('tournament-detail');
@@ -88,19 +112,24 @@ function App() {
           <>
             <Header activeTownHall={activeTownHall} setActiveTownHall={setActiveTownHall} />
             <main className="container mx-auto px-4 py-8">
-              <BaseLayoutGrid layouts={layouts} loading={loading} error={error} apiBaseUrl={API_BASE_URL} />
+              <BaseLayoutGrid 
+                layouts={layouts} 
+                loading={loading} 
+                error={error} 
+                apiBaseUrl={API_BASE_URL}
+                lastBaseElementRef={lastBaseElementRef} // Pass the ref down
+              />
             </main>
           </>
         );
     }
   };
 
-
   return (
     <div className="bg-gray-900 min-h-screen text-gray-200 font-sans">
       <Navbar 
         onLogout={handleLogout}
-        onNavigate={navigateTo} // Use navigateTo for general navigation
+        onNavigate={navigateTo} 
       />
       {renderPage()}
     </div>

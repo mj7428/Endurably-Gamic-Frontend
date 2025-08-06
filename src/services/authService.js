@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 
 
 const register = (name, email, password, role) => {
-  return axios.post(`${API_BASE_URL}/user`, {
+  return axios.post(`${API_BASE_URL}/users`, {
     name,
     email,
     password,
@@ -13,7 +13,7 @@ const register = (name, email, password, role) => {
 };
 
 const login = async (email, password) => {
-  const response = await axios.post(`${API_BASE_URL}/user/login`, {
+  const response = await axios.post(`${API_BASE_URL}/auth/login`, {
     email,
     password,
   });

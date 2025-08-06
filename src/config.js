@@ -1,4 +1,4 @@
-// const API_BASE_URL = 'http://13.233.68.227';
+// const API_BASE_URL = 'https://np8fl1g1xc.execute-api.ap-south-1.amazonaws.com/prod';
 
 // export { API_BASE_URL };
 

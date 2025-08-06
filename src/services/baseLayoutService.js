@@ -36,9 +36,25 @@ const getMyBases = (page = 0, size = 4) => {
   });
 };
 
+
+const getAll = (pageable, townhallLevel) => {
+    const params = new URLSearchParams({
+        page: pageable.page,
+        size: pageable.size,
+        sort: 'id,desc',
+    });
+
+    if (townhallLevel) {
+        params.append('townhallLevel', townhallLevel);
+    }
+
+    return axios.get(`${API_BASE_URL}/bases?${params.toString()}`);
+};
+
 const baseLayoutService = {
   createBase,
   getMyBases, 
+  getAll
 };
 
 export default baseLayoutService;
