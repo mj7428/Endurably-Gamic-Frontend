@@ -14,7 +14,7 @@ const StarRating = ({ rating }) => {
     stars.push(
       <div key={i} className="relative">
         {/* Background star is now gray */}
-        <span className="text-gray-600">★</span>
+        <span className="text-gray-800">★</span>
         <div
           className="absolute top-0 left-0 h-full overflow-hidden"
           style={{ width: fillPercentage }}
@@ -64,7 +64,7 @@ const BaseLayoutCard = ({ layout }) => {
         </div>
         {/* Star Rating (Top Left) */}
         <div className="absolute top-1 left-1 flex items-center space-x-1">
-            <StarRating rating={4.6} />
+            <StarRating rating={3.3} />
         </div>
       </div>
       
