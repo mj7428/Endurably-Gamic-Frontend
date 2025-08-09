@@ -20,17 +20,14 @@ function App() {
   const { user, login, logout } = useAuth(); 
   const [activeTournamentId, setActiveTournamentId] = useState(null);
 
-  // --- State for Homepage Content ---
   const [layouts, setLayouts] = useState([]);
   const [activeTownHall, setActiveTownHall] = useState(15);
   
-  // --- State for Infinite Scroll ---
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- IntersectionObserver for Infinite Scroll ---
   const observer = useRef();
   const lastBaseElementRef = useCallback(node => {
     if (loading) return;
@@ -43,28 +40,21 @@ function App() {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
-  // --- Effect to reset the list when filters change ---
   useEffect(() => {
-    // When the town hall filter changes, reset everything to start a new search
     setLayouts([]);
     setPage(0);
     setHasMore(true);
   }, [activeTownHall]);
 
-  // --- Effect to fetch data when page or filters change ---
   useEffect(() => {
-    // Don't fetch if not on the home page or if there's no more data
     if (currentPage !== 'home' || !hasMore) return;
 
     const fetchLayouts = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Use the baseLayoutService to fetch data
         const response = await baseLayoutService.getAll({ page, size: 8 }, activeTownHall);
-        // Append new layouts to the existing list
         setLayouts(prevLayouts => [...prevLayouts, ...response.data.content]);
-        // Check if this was the last page
         setHasMore(!response.data.last);
       } catch (err) {
         setError('Failed to fetch base layouts. Is the server running?');
@@ -75,10 +65,9 @@ function App() {
     };
     
     fetchLayouts();
-  }, [page, activeTownHall, currentPage]); // Re-run when page or filter changes
+  }, [page, activeTownHall, currentPage]); 
 
 
-  // --- Event Handlers ---
   const handleLoginSuccess = () => { login(); setCurrentPage('home'); };
   const handleLogout = () => { logout(); setCurrentPage('home'); };
   const navigateTo = (page) => { setActiveTournamentId(null); setCurrentPage(page); };
