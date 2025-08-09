@@ -63,9 +63,8 @@ const BaseLayoutCard = ({ layout }) => {
           TH {layout.townhallLevel}
         </div>
         {/* Star Rating (Top Left) */}
-        <div className="absolute top-2 left-2 flex items-center space-x-1 bg-black bg-opacity-50 px-2 py-1 rounded-full">
+        <div className="absolute top-1 left-1 flex items-center space-x-1">
             <StarRating rating={4.6} />
-            <span className="text-white text-xs font-bold ml-1">4.8</span>
         </div>
       </div>
       
