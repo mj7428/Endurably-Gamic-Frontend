@@ -12,14 +12,14 @@ const BaseLayoutCard = ({ layout }) => {
   
   // Helper component for the Views icon
   const EyeIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
         <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
     </svg>
   );
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-1 group flex flex-col h-80">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-1 group flex flex-col h-72">
       
       {/* Image Section */}
       <div className="relative">
@@ -27,11 +27,16 @@ const BaseLayoutCard = ({ layout }) => {
           src={layout.imageUrl} 
           alt={layout.title} 
           className="w-full h-40 object-cover"
-          // Fallback image in case the src link is broken
           onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/600x400/1F2937/FFFFFF?text=Image+Not+Found`; }}
         />
+        {/* Townhall Level Indicator (Top Right) */}
         <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-bl-lg">
           TH {layout.townhallLevel}
+        </div>
+        {/* Star Rating (Top Left) */}
+        <div className="absolute top-2 left-2 flex items-center space-x-0.5 text-yellow-400 bg-black bg-opacity-50 px-2 py-1 rounded-full">
+            <span>⭐</span>
+            <span className="text-white text-xs font-bold">4.8</span>
         </div>
       </div>
       
@@ -42,29 +47,26 @@ const BaseLayoutCard = ({ layout }) => {
           <h3 className="text-md font-bold text-gray-100 mb-1 group-hover:text-blue-400 transition-colors h-12 line-clamp-2">
             {layout.title}
           </h3>
-          <p className="text-xs text-gray-400 mb-2">
-            By {layout.submittedByUsername}
-          </p>
         </div>
         
         {/* Combined Info and Action Section */}
         <div className="mt-2 flex items-end justify-between">
             {/* Left side: Info */}
-            <div>
-                <div className="flex items-center text-xs text-gray-500">
+            <div className="text-xs">
+                <p className="text-gray-400">
+                    By {layout.submittedByUsername}
+                </p>
+                <div className="flex items-center text-gray-500 mt-1">
                     <EyeIcon />
                     <span>21.5k Views</span>
-                </div>
-                <div className="flex items-center space-x-0.5 text-yellow-400 mt-1">
-                    <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
                 </div>
             </div>
 
             {/* Right side: Action Link (styled as a button) */}
             <a 
               href={layout.baseLink}
-              target="_blank" // Opens the link in a new tab
-              rel="noopener noreferrer" // Security best practice for new tabs
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center justify-center px-3 py-1.5 bg-blue-600 text-white font-semibold rounded-lg transition-colors duration-300 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-xs"
             >
               <LinkIcon />
