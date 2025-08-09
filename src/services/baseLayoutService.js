@@ -16,7 +16,7 @@ const createBase = async (title, townhallLevel, baseLink, imageFile) => {
   
    try {
     const imageFormData = new FormData();
-    imageFormData.append('image', imageFile);
+    imageFormData.append('file', imageFile);
 
     const uploadResponse = await axios.post(IMAGE_UPLOAD_API_URL, imageFormData, {
       headers: {
