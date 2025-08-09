@@ -25,7 +25,7 @@ const createBase = async (title, townhallLevel, baseLink, imageFile) => {
     });
 
 
-    const imageUrl = uploadResponse.imageUrl;
+    const imageUrl = uploadResponse.data.imageUrl;
 
     const baseData = {
       title,
