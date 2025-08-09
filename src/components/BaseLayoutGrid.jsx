@@ -1,5 +1,34 @@
 import React from 'react';
 
+// NEW: StarRating component to display fractional ratings
+const StarRating = ({ rating }) => {
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    let fillPercentage = '0%';
+    if (i < rating) {
+      fillPercentage = '100%';
+    } else if (i === Math.ceil(rating)) {
+      fillPercentage = `${(rating - Math.floor(rating)) * 100}%`;
+    }
+
+    stars.push(
+      <div key={i} className="relative">
+        {/* Background star is now gray */}
+        <span className="text-gray-600">★</span>
+        <div
+          className="absolute top-0 left-0 h-full overflow-hidden"
+          style={{ width: fillPercentage }}
+        >
+          {/* Foreground (fill) star is yellow */}
+          <span className="text-yellow-400">★</span>
+        </div>
+      </div>
+    );
+  }
+  return <div className="flex items-center">{stars}</div>;
+};
+
+
 // Main Component for the Base Layout Card
 const BaseLayoutCard = ({ layout }) => {
 
@@ -34,9 +63,9 @@ const BaseLayoutCard = ({ layout }) => {
           TH {layout.townhallLevel}
         </div>
         {/* Star Rating (Top Left) */}
-        <div className="absolute top-2 left-2 flex items-center space-x-0.5 text-yellow-400 bg-black bg-opacity-50 px-2 py-1 rounded-full">
-            <span>⭐</span>
-            <span className="text-white text-xs font-bold">4.8</span>
+        <div className="absolute top-2 left-2 flex items-center space-x-1 bg-black bg-opacity-50 px-2 py-1 rounded-full">
+            <StarRating rating={4.6} />
+            <span className="text-white text-xs font-bold ml-1">4.8</span>
         </div>
       </div>
       
