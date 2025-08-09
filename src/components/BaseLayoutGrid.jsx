@@ -26,7 +26,7 @@ const BaseLayoutCard = ({ layout }) => {
         <img 
           src={layout.imageUrl} 
           alt={layout.title} 
-          className="w-full h-48 object-cover"
+          className="w-full h-40 object-cover"
           // Fallback image in case the src link is broken
           onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/600x400/1F2937/FFFFFF?text=Image+Not+Found`; }}
         />
