@@ -14,7 +14,7 @@ const StarRating = ({ rating }) => {
     stars.push(
       <div key={i} className="relative">
         {/* Background star is now gray */}
-        <span className="text-gray-800">★</span>
+        <span className="text-gray-300">★</span>
         <div
           className="absolute top-0 left-0 h-full overflow-hidden"
           style={{ width: fillPercentage }}
@@ -48,7 +48,7 @@ const BaseLayoutCard = ({ layout }) => {
   );
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-1 group flex flex-col h-72">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-md hover:shadow-blue-500/50 hover:-translate-y-1 group flex flex-col h-70">
       
       {/* Image Section */}
       <div className="relative">
@@ -64,7 +64,7 @@ const BaseLayoutCard = ({ layout }) => {
         </div>
         {/* Star Rating (Top Left) */}
         <div className="absolute top-1 left-1 flex items-center space-x-1">
-            <StarRating rating={3.3} />
+            <StarRating rating={3.5} />
         </div>
       </div>
       
@@ -112,7 +112,7 @@ const BaseLayoutGrid = ({ layouts, loading, error, lastBaseElementRef }) => {
   
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {layouts.map((layout, index) => {
           if (layouts.length === index + 1) {
             return (
