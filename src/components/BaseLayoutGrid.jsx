@@ -3,13 +3,12 @@ import { API_BASE_URL } from '../config';
 
 // A single, self-contained card component
 const BaseLayoutCard = ({ layout }) => {
-  const imageUrl = `${API_BASE_URL}${layout.imageUrl}`;
 
   return (
     <div className="bg-brand-surface rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300 group">
       <div className="relative">
         <img 
-          src={imageUrl} 
+          src={layout.imageUrl} 
           alt={layout.title} 
           className="w-full h-48 object-cover"
           onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/600x400/1F2937/FFFFFF?text=Image+Not+Found`; }}

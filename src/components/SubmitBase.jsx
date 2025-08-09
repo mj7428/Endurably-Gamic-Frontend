@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import baseLayoutService from '../services/baseLayoutService';
-import { API_BASE_URL } from '../config'; 
 
 const MiniBaseCard = ({ layout }) => (
     <div className="bg-gray-700 rounded-lg p-3 flex items-center space-x-4 transition-transform hover:scale-105">
         <img 
-            src={`${API_BASE_URL}${layout.imageUrl}`} 
+            src={`${layout.imageUrl}`} 
             alt={layout.title} 
             className="w-16 h-16 object-cover rounded-md flex-shrink-0"
             onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/374151/FFFFFF?text=Img`; }}
