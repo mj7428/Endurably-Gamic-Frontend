@@ -48,14 +48,14 @@ const BaseLayoutCard = ({ layout }) => {
   );
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-md hover:shadow-blue-500/50 hover:-translate-y-1 group flex flex-col h-70">
+    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-md hover:shadow-blue-500/50 hover:-translate-y-1 group flex flex-col h-88">
       
       {/* Image Section */}
       <div className="relative">
         <img 
           src={layout.imageUrl} 
           alt={layout.title} 
-          className="w-full h-40 object-cover"
+          className="w-full h-58 object-cover"
           onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/600x400/1F2937/FFFFFF?text=Image+Not+Found`; }}
         />
         {/* Townhall Level Indicator (Top Right) */}
