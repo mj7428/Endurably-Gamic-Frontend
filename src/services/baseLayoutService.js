@@ -10,18 +10,40 @@ const getAuthHeaders = () => {
   return {};
 };
 
-const createBase = (title, townhallLevel, baseLink, imageFile) => {
-  const formData = new FormData();
-  formData.append('title', title);
-  formData.append('townhallLevel', townhallLevel);
-  formData.append('baseLink', baseLink);
-  formData.append('image', imageFile);
+const createBase = async (title, townhallLevel, baseLink, imageFile) => {
+  const IMAGE_UPLOAD_API_URL = "https://0wfcf7x5t9.execute-api.ap-south-1.amazonaws.com/prod/upload";
 
-  return axios.post(`${API_BASE_URL}/bases`, formData, {
-    headers: {
-      ...getAuthHeaders(),
-    },
-  });
+  
+   try {
+    const imageFormData = new FormData();
+    imageFormData.append('image', imageFile);
+
+    const uploadResponse = await axios.post(IMAGE_UPLOAD_API_URL, imageFormData, {
+      headers: {
+        ...getAuthHeaders(),
+      },
+    });
+
+    const imageUrl = uploadResponse.data;
+
+    const baseData = {
+      title,
+      townhallLevel,
+      baseLink,
+      imageUrl,
+    };
+
+    const createResponse = await axios.post(`${API_BASE_URL}/bases`, baseData, {
+      headers: {
+        ...getAuthHeaders(),
+      },
+    });
+    
+    return createResponse;
+
+  } catch (error) {
+    throw error;
+  }
 };
 
 const getMyBases = (page = 0, size = 4) => {
