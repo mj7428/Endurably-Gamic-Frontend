@@ -26,7 +26,9 @@ const createTournament = (tournamentData) => {
 };
 
 const getTournamentById = (id) => {
-  return axios.get(`${API_BASE_URL}/tournaments/${id}`);
+  return axios.get(`${API_BASE_URL}/tournaments/${id}`, {
+    headers: getAuthHeaders(),
+  });
 };
 
 const registerTeam = (tournamentId, registrationData) => {

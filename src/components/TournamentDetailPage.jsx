@@ -2,6 +2,39 @@ import React, { useState, useEffect } from 'react';
 import tournamentService from '../services/tournamentService'; // Assuming you have this service
 import { useAuth } from '../context/AuthContext'; // Assuming you have this context
 
+// NEW: A component to display the user's existing registration details
+const RegistrationDetails = ({ registration }) => (
+    <div className="bg-green-900/50 border border-green-700 p-6 rounded-lg">
+        <h4 className="text-xl font-bold text-green-300 mb-4">You Are Registered!</h4>
+        <p className="text-gray-300 mb-4">Here are the details you submitted:</p>
+        
+        <div className="space-y-4">
+            {/* Team Details */}
+            <div>
+                <h5 className="font-semibold text-gray-200 mb-2">Team Details</h5>
+                <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
+                    {registration.teamFields.map(field => (
+                        <p key={field.fieldName}><span className="text-gray-400">{field.fieldName}:</span> {field.value}</p>
+                    ))}
+                </div>
+            </div>
+
+            {/* Player Details */}
+            {registration.playerSubmissions.map((player, index) => (
+                 <div key={player.playerSubmissionId}>
+                    <h5 className="font-semibold text-gray-200 mb-2 mt-3">Player {index + 1}</h5>
+                    <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
+                        {player.fieldValues.map(field => (
+                            <p key={field.fieldName}><span className="text-gray-400">{field.fieldName.replace(`Player ${index + 1} `, '')}:</span> {field.value}</p>
+                        ))}
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
+
+
 const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     const { user } = useAuth();
     const [tournament, setTournament] = useState(null);
@@ -14,6 +47,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     useEffect(() => {
         const fetchTournament = async () => {
             try {
+                // The service call is the same, but the response will now contain userRegistration
                 const response = await tournamentService.getTournamentById(tournamentId);
                 setTournament(response.data);
             } catch (err) {
@@ -36,7 +70,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         setError('');
         setSuccess('');
 
-        // This logic correctly builds the complex DTO structure
         const registrationData = {
             teamFields: [],
             playerSubmissions: []
@@ -46,7 +79,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         tournament.requiredFields.forEach(field => {
             const value = formValues[field.id];
             if (!value && field.isRequired) {
-                // Basic check for required fields
                 setError(`Field "${field.fieldName}" is required.`);
                 setLoading(false);
                 return;
@@ -71,13 +103,18 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             }
         });
         
-        if(error) return; // Stop submission if there was a validation error
+        if(error) {
+            setLoading(false);
+            return;
+        }
 
         registrationData.playerSubmissions = Object.values(playersMap);
 
         try {
             await tournamentService.registerTeam(tournamentId, registrationData);
             setSuccess('Your team has been registered successfully!');
+            const response = await tournamentService.getTournamentById(tournamentId);
+            setTournament(response.data);
         } catch (err) {
             const errorMsg = err.response?.data?.messages?.join(', ') || 'Registration failed. Please check your details.';
             setError(errorMsg);
@@ -87,7 +124,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         }
     };
 
-    // Helper to group fields for rendering
     const getGroupedFields = () => {
         if (!tournament) return { teamFields: [], playerFields: [] };
         
@@ -106,10 +142,10 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         return { teamFields, playerFields };
     };
 
-    if (loading) return <p className="text-center text-xl p-8">Loading Tournament...</p>;
+    if (loading && !tournament) return <p className="text-center text-xl p-8">Loading Tournament...</p>;
     if (error && !tournament) return <p className="text-center text-xl text-red-500 p-8">{error}</p>;
 
-    const isTournamentFinished = new Date(tournament.startDate) < new Date();
+    const isTournamentFinished = tournament && new Date(tournament.startDate) < new Date();
     const { teamFields, playerFields } = getGroupedFields();
 
     return (
@@ -120,6 +156,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                 
                 <h3 className="text-2xl font-bold text-white mb-4 border-t border-gray-700 pt-6">Registration</h3>
                 
+                {/* This is the updated rendering logic */}
                 {!user ? (
                     <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
                         <p>You must be logged in to register for this tournament.</p>
@@ -130,9 +167,12 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                 ) : isTournamentFinished ? (
                     <div className="text-center text-yellow-400 bg-yellow-900/50 border border-yellow-700 p-8 rounded-lg">
                         <p className="font-bold text-lg">Registrations for this tournament have closed.</p>
-                        <p>The event has already started or is finished.</p>
                     </div>
+                ) : tournament.userRegistration ? (
+                    // If userRegistration exists, show their details
+                    <RegistrationDetails registration={tournament.userRegistration} />
                 ) : (
+                    // Otherwise, show the registration form
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Team Fields Section */}
                         <div>
