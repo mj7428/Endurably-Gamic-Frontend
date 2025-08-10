@@ -40,20 +40,49 @@ function App() {
     if (node) observer.current.observe(node);
   }, [loading, hasMore]);
 
+  // ✅ HOOK 1: Handles fetching a NEW set of layouts.
+  // This runs when the town hall filter changes or when navigating back to the home page.
   useEffect(() => {
+    // Only run this logic when on the home page.
+    if (currentPage !== 'home') return;
+
+    // Reset state for the new search
     setLayouts([]);
     setPage(0);
     setHasMore(true);
-  }, [activeTownHall]);
+    
+    const fetchInitialLayouts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Always fetch the first page (page: 0) for a new search
+        const response = await baseLayoutService.getAll({ page: 0, size: 8 }, activeTownHall);
+        setLayouts(response.data.content);
+        setHasMore(!response.data.last);
+      } catch (err) {
+        setError('Failed to fetch base layouts. Is the server running?');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchInitialLayouts();
+  }, [activeTownHall, currentPage]); // Dependencies: the filter and the page itself
 
+
+  // ✅ HOOK 2: Handles fetching SUBSEQUENT pages for infinite scroll.
+  // This runs only when the page number increases.
   useEffect(() => {
-    if (currentPage !== 'home' || !hasMore) return;
+    // Don't run this for the initial load (page 0) or if not on the home page.
+    if (page === 0 || currentPage !== 'home' || !hasMore) return;
 
-    const fetchLayouts = async () => {
+    const fetchMoreLayouts = async () => {
       setLoading(true);
       setError(null);
       try {
         const response = await baseLayoutService.getAll({ page, size: 8 }, activeTownHall);
+        // Append the new layouts to the existing list
         setLayouts(prevLayouts => [...prevLayouts, ...response.data.content]);
         setHasMore(!response.data.last);
       } catch (err) {
@@ -64,8 +93,8 @@ function App() {
       }
     };
     
-    fetchLayouts();
-  }, [page, activeTownHall, currentPage]); 
+    fetchMoreLayouts();
+  }, [page]); // Dependency: only the page number
 
 
   const handleLoginSuccess = () => { login(); setCurrentPage('home'); };
@@ -106,7 +135,7 @@ function App() {
                 loading={loading} 
                 error={error} 
                 apiBaseUrl={API_BASE_URL}
-                lastBaseElementRef={lastBaseElementRef} // Pass the ref down
+                lastBaseElementRef={lastBaseElementRef}
               />
             </main>
           </>
