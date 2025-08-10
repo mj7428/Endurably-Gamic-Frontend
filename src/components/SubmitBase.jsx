@@ -4,7 +4,7 @@ import baseLayoutService from '../services/baseLayoutService';
 const MiniBaseCard = ({ layout }) => (
     <div className="bg-gray-700 rounded-lg p-3 flex items-center space-x-4 transition-transform hover:scale-105">
         <img 
-            src={`${layout.imageUrl}`} 
+            src={layout.imageUrl} 
             alt={layout.title} 
             className="w-16 h-16 object-cover rounded-md flex-shrink-0"
             onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/374151/FFFFFF?text=Img`; }}
@@ -28,7 +28,7 @@ const SubmitBase = () => {
     const [myBases, setMyBases] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [isLoadingBases, setIsLoadingBases] = useState(false);
+    const [isLoadingBases, setIsLoadingBases] = useState(true);
     const [listVersion, setListVersion] = useState(0);
 
     const observer = useRef();
@@ -42,19 +42,15 @@ const SubmitBase = () => {
         });
         if (node) observer.current.observe(node);
     }, [isLoadingBases, hasMore]);
-
+    
     useEffect(() => {
+        if (!hasMore && page > 0) return;
+
+        setIsLoadingBases(true);
         const fetchMyBases = async () => {
-            setIsLoadingBases(true);
             try {
                 const response = await baseLayoutService.getMyBases(page, 5);
-                
-                if (page === 0) {
-                    setMyBases(response.data.content);
-                } else {
-                    setMyBases(prevBases => [...prevBases, ...response.data.content]);
-                }
-                console.log("------------------------response ---------------",!response.data.last);
+                setMyBases(prevBases => page === 0 ? response.data.content : [...prevBases, ...response.data.content]);
                 setHasMore(!response.data.last);
             } catch (err) {
                 console.error("Failed to fetch user's bases", err);
@@ -62,13 +58,17 @@ const SubmitBase = () => {
                 setIsLoadingBases(false);
             }
         };
-        if (hasMore) {
-            console.log("------------------------checking has more ---------------",hasMore);
-            fetchMyBases();
-        }
+        fetchMyBases();
     }, [page, listVersion]);
+    
+     useEffect(() => {
+        if (listVersion > 0) {
+            setMyBases([]);
+            setPage(0);
+            setHasMore(true);
+        }
+    }, [listVersion]);
 
-    // Handler for the form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!imageFile) {
@@ -89,9 +89,7 @@ const SubmitBase = () => {
             setImageFile(null);
             e.target.reset();
             
-            setPage(0);
-            setHasMore(true);
-            setListVersion(v => v + 1); 
+            setListVersion(v => v + 1);
 
         } catch (err) {
             setFormError('Submission failed. Please try again.');
@@ -103,10 +101,11 @@ const SubmitBase = () => {
 
     return (
         <div className="container mx-auto p-4 md:p-8">
-            <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                 
-                <div className="md:sticky top-8 h-fit">
-                   <div className="bg-gray-800 p-8 rounded-lg shadow-lg">
+                {/* Form Section */}
+                <div className="md:sticky top-24 h-fit">
+                   <div className="bg-gray-800 p-6 md:p-8 rounded-lg shadow-lg">
                         <h2 className="text-2xl font-bold text-white mb-6 text-center">Submit a New Base</h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
@@ -136,6 +135,7 @@ const SubmitBase = () => {
                     </div>
                 </div>
 
+                {/* Submissions List Section */}
                 <div className="flex flex-col space-y-4">
                     <h3 className="text-xl font-bold text-white">Your Submissions</h3>
                     {myBases.map((base, index) => {
@@ -145,7 +145,7 @@ const SubmitBase = () => {
                             return <MiniBaseCard key={base.id} layout={base} />;
                         }
                     })}
-                    {isLoadingBases && <p className="text-center text-gray-400">Loading more...</p>}
+                    {isLoadingBases && <p className="text-center text-gray-400">Loading...</p>}
                     {!hasMore && myBases.length > 0 && <p className="text-center text-gray-500">You've reached the end.</p>}
                     {myBases.length === 0 && !isLoadingBases && <p className="text-center text-gray-500">You haven't submitted any bases yet.</p>}
                 </div>

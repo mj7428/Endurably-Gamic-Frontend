@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import tournamentService from '../services/tournamentService'; // Assuming you have this service
 import { useAuth } from '../context/AuthContext'; // Assuming you have this context
 
-// NEW: A component to display the user's existing registration details
+// A component to display the user's existing registration details
 const RegistrationDetails = ({ registration }) => (
     <div className="bg-green-900/50 border border-green-700 p-6 rounded-lg">
         <h4 className="text-xl font-bold text-green-300 mb-4">You Are Registered!</h4>
@@ -47,7 +47,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     useEffect(() => {
         const fetchTournament = async () => {
             try {
-                // The service call is the same, but the response will now contain userRegistration
                 const response = await tournamentService.getTournamentById(tournamentId);
                 setTournament(response.data);
             } catch (err) {
@@ -58,7 +57,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             }
         };
         fetchTournament();
-    }, [tournamentId]);
+    }, [tournamentId, success]); // Re-fetch on success to show new registration
 
     const handleInputChange = (fieldId, value) => {
         setFormValues(prev => ({ ...prev, [fieldId]: value }));
@@ -80,7 +79,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             const value = formValues[field.id];
             if (!value && field.isRequired) {
                 setError(`Field "${field.fieldName}" is required.`);
-                setLoading(false);
                 return;
             }
             if (!value) return;
@@ -113,8 +111,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         try {
             await tournamentService.registerTeam(tournamentId, registrationData);
             setSuccess('Your team has been registered successfully!');
-            const response = await tournamentService.getTournamentById(tournamentId);
-            setTournament(response.data);
         } catch (err) {
             const errorMsg = err.response?.data?.messages?.join(', ') || 'Registration failed. Please check your details.';
             setError(errorMsg);
@@ -150,13 +146,14 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <div className="bg-gray-800 rounded-lg shadow-lg p-8">
+            <div className="bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8">
                 <h2 className="text-3xl font-bold text-white mb-2">{tournament.name}</h2>
                 <p className="text-gray-400 mb-6">{tournament.rules}</p>
                 
                 <h3 className="text-2xl font-bold text-white mb-4 border-t border-gray-700 pt-6">Registration</h3>
                 
-                {/* This is the updated rendering logic */}
+                {success && <p className="text-sm text-green-400 text-center mb-4">{success}</p>}
+
                 {!user ? (
                     <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
                         <p>You must be logged in to register for this tournament.</p>
@@ -169,12 +166,9 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                         <p className="font-bold text-lg">Registrations for this tournament have closed.</p>
                     </div>
                 ) : tournament.userRegistration ? (
-                    // If userRegistration exists, show their details
                     <RegistrationDetails registration={tournament.userRegistration} />
                 ) : (
-                    // Otherwise, show the registration form
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Team Fields Section */}
                         <div>
                             <h4 className="text-lg font-semibold text-gray-200 mb-3">Team Details</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -195,7 +189,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                             </div>
                         </div>
 
-                        {/* Player Fields Section */}
                         {playerFields.map(playerGroup => (
                             <div key={playerGroup.playerNumber}>
                                 <h4 className="text-lg font-semibold text-gray-200 mb-3 border-t border-gray-700 pt-4">Player {playerGroup.playerNumber}</h4>
@@ -219,8 +212,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                         ))}
 
                         {error && <p className="text-sm text-red-400 text-center">{error}</p>}
-                        {success && <p className="text-sm text-green-400 text-center">{success}</p>}
-
+                        
                         <button type="submit" disabled={loading} className="w-full py-3 mt-6 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-500">
                             {loading ? 'Submitting...' : 'Register Team'}
                         </button>

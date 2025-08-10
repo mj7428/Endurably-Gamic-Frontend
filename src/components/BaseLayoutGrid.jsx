@@ -64,7 +64,7 @@ const BaseLayoutCard = ({ layout }) => {
         </div>
         {/* Star Rating (Top Left) */}
         <div className="absolute top-1 left-1 flex items-center space-x-1">
-            <StarRating rating={3.5} />
+            <StarRating rating={4.4} />
         </div>
       </div>
       
@@ -106,7 +106,6 @@ const BaseLayoutCard = ({ layout }) => {
   );
 };
 
-// Component to render the grid of BaseLayoutCards
 const BaseLayoutGrid = ({ layouts, loading, error, lastBaseElementRef }) => {
   if (error && layouts.length === 0) return <p className="text-center text-xl text-red-500">{error}</p>;
   

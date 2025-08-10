@@ -1,14 +1,8 @@
-import React,
-{
-    useState
-}
-from 'react';
+import React, { useState } from 'react';
 import authService from '../services/authService';
 import registerImage from '../assets/registerfor.png';
 
-const Register = ({
-    onNavigate
-}) => {
+const Register = ({ onNavigate }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -23,13 +17,14 @@ const Register = ({
         setLoading(true);
 
         try {
-            await authService.register(name, email, password, "User");
-            setSuccess('Registration successful! Please log in.');
+            await authService.register(name, email, password);
+            setSuccess('Registration successful! Redirecting to login...');
             setTimeout(() => {
                 onNavigate('login');
             }, 2000);
         } catch (err) {
-            setError('Registration failed. Please try again.');
+            const errorMsg = err.response?.data?.messages?.join(', ') || 'Registration failed. Please try again.';
+            setError(errorMsg);
             console.error(err);
         } finally {
             setLoading(false);
