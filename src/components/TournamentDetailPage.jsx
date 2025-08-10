@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import tournamentService from '../services/tournamentService';
-import { useAuth } from '../context/AuthContext';
+import tournamentService from '../services/tournamentService'; // Assuming you have this service
+import { useAuth } from '../context/AuthContext'; // Assuming you have this context
 
 const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     const { user } = useAuth();
@@ -45,6 +45,12 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
 
         tournament.requiredFields.forEach(field => {
             const value = formValues[field.id];
+            if (!value && field.isRequired) {
+                // Basic check for required fields
+                setError(`Field "${field.fieldName}" is required.`);
+                setLoading(false);
+                return;
+            }
             if (!value) return;
 
             const fieldValue = {
@@ -64,6 +70,8 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                 registrationData.teamFields.push(fieldValue);
             }
         });
+        
+        if(error) return; // Stop submission if there was a validation error
 
         registrationData.playerSubmissions = Object.values(playersMap);
 
@@ -71,18 +79,38 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             await tournamentService.registerTeam(tournamentId, registrationData);
             setSuccess('Your team has been registered successfully!');
         } catch (err) {
-            setError('Registration failed. Please check your details.');
+            const errorMsg = err.response?.data?.messages?.join(', ') || 'Registration failed. Please check your details.';
+            setError(errorMsg);
             console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
+    // Helper to group fields for rendering
+    const getGroupedFields = () => {
+        if (!tournament) return { teamFields: [], playerFields: [] };
+        
+        const teamFields = tournament.requiredFields.filter(f => !f.fieldName.match(/Player (\d+)/i));
+        const playerFields = [];
+        
+        for (let i = 1; i <= tournament.teamSize; i++) {
+            const fieldsForPlayer = tournament.requiredFields.filter(f => {
+                const match = f.fieldName.match(/Player (\d+)/i);
+                return match && parseInt(match[1]) === i;
+            });
+            if (fieldsForPlayer.length > 0) {
+                playerFields.push({ playerNumber: i, fields: fieldsForPlayer });
+            }
+        }
+        return { teamFields, playerFields };
+    };
+
     if (loading) return <p className="text-center text-xl p-8">Loading Tournament...</p>;
     if (error && !tournament) return <p className="text-center text-xl text-red-500 p-8">{error}</p>;
 
-    // ✅ Check if the tournament has already started
     const isTournamentFinished = new Date(tournament.startDate) < new Date();
+    const { teamFields, playerFields } = getGroupedFields();
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -92,7 +120,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                 
                 <h3 className="text-2xl font-bold text-white mb-4 border-t border-gray-700 pt-6">Registration</h3>
                 
-                {/* Conditionally render the correct UI based on login status and tournament date */}
                 {!user ? (
                     <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
                         <p>You must be logged in to register for this tournament.</p>
@@ -106,19 +133,48 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                         <p>The event has already started or is finished.</p>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {tournament.requiredFields.map(field => (
-                            <div key={field.id}>
-                                <label htmlFor={`field-${field.id}`} className="block text-sm font-medium text-gray-300">
-                                    {field.fieldName} {field.isRequired && '*'}
-                                </label>
-                                <input
-                                    id={`field-${field.id}`}
-                                    type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
-                                    onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                    required={field.isRequired}
-                                    className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                />
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Team Fields Section */}
+                        <div>
+                            <h4 className="text-lg font-semibold text-gray-200 mb-3">Team Details</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {teamFields.map(field => (
+                                    <div key={field.id}>
+                                        <label htmlFor={`field-${field.id}`} className="block text-sm font-medium text-gray-300">
+                                            {field.fieldName} {field.isRequired && <span className="text-red-500">*</span>}
+                                        </label>
+                                        <input
+                                            id={`field-${field.id}`}
+                                            type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
+                                            onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                            required={field.isRequired}
+                                            className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Player Fields Section */}
+                        {playerFields.map(playerGroup => (
+                            <div key={playerGroup.playerNumber}>
+                                <h4 className="text-lg font-semibold text-gray-200 mb-3 border-t border-gray-700 pt-4">Player {playerGroup.playerNumber}</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {playerGroup.fields.map(field => (
+                                         <div key={field.id}>
+                                            <label htmlFor={`field-${field.id}`} className="block text-sm font-medium text-gray-300">
+                                                {field.fieldName.replace(`Player ${playerGroup.playerNumber} `, '')} {field.isRequired && <span className="text-red-500">*</span>}
+                                            </label>
+                                            <input
+                                                id={`field-${field.id}`}
+                                                type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
+                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                                required={field.isRequired}
+                                                className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         ))}
 
