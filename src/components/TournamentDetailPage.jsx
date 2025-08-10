@@ -9,7 +9,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     
-    // This state will hold the user's answers for the dynamic form
     const [formValues, setFormValues] = useState({});
 
     useEffect(() => {

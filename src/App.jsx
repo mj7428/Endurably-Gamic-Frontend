@@ -73,7 +73,7 @@ function App() {
   const navigateTo = (page) => { setActiveTournamentId(null); setCurrentPage(page); };
   const viewTournamentDetails = (id) => {
     setActiveTournamentId(id);
-    if (user && user.roles.includes('ROLE_Admin')) {
+    if (user && user.roles.includes('ROLE_ADMIN')) {
       setCurrentPage('view-registrations');
     } else {
       setCurrentPage('tournament-detail');
