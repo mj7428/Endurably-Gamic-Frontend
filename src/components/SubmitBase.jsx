@@ -104,7 +104,7 @@ const SubmitBase = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                 
                 {/* Form Section */}
-                <div className="md:sticky top-24 h-fit">
+                <div className="sm:sticky top-24 h-fit">
                    <div className="bg-gray-800 p-6 md:p-8 rounded-lg shadow-lg">
                         <h2 className="text-2xl font-bold text-white mb-6 text-center">Submit a New Base</h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -128,14 +128,13 @@ const SubmitBase = () => {
                             {formError && <p className="text-sm text-red-400 text-center">{formError}</p>}
                             {formSuccess && <p className="text-sm text-green-400 text-center">{formSuccess}</p>}
                             
-                            <button type="submit" disabled={isSubmitting} className="w-full py-3 px-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-all">
+                            <button type="submit" disabled={isSubmitting} className="w-full py-3 px-4 mb-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-all">
                                 {isSubmitting ? 'Submitting...' : 'Submit Base'}
                             </button>
                         </form>
                     </div>
                 </div>
 
-                {/* Submissions List Section */}
                 <div className="flex flex-col space-y-4">
                     <h3 className="text-xl font-bold text-white">Your Submissions</h3>
                     {myBases.map((base, index) => {

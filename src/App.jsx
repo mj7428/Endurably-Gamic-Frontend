@@ -11,6 +11,8 @@ import TournamentDetailPage from './components/TournamentDetailPage';
 import TournamentRegistrationsPage from './components/TournamentRegistrationsPage';
 import { useAuth } from './context/AuthContext';
 import baseLayoutService from './services/baseLayoutService';
+import Footer from './components/Footer';
+import { PrivacyPolicyPage, TermsOfServicePage } from './components/LegalPages';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -101,6 +103,8 @@ function App() {
       case 'create-tournament': return <CreateTournamentPage onNavigate={navigateTo}/>;
       case 'tournament-detail': return <TournamentDetailPage tournamentId={activeTournamentId} onNavigate={navigateTo} />;
       case 'view-registrations': return <TournamentRegistrationsPage tournamentId={activeTournamentId} />;
+      case 'terms': return <TermsOfServicePage />;
+      case 'privacy': return <PrivacyPolicyPage />;
       default:
         return (
           <>
@@ -126,6 +130,7 @@ function App() {
         onNavigate={navigateTo} 
       />
       {renderPage()}
+      <Footer onNavigate={navigateTo} />
     </div>
   );
 }
