@@ -22,25 +22,26 @@ const StatusBadge = ({ status }) => {
 // Redesigned Card for Submissions (with Admin Actions)
 // ============================================================================
 const SubmissionCard = ({ layout, isAdmin, onApprove, onReject }) => (
-    <div className="bg-gray-700 rounded-lg p-3 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+    <div className="bg-gray-700 rounded-lg p-3 flex items-center space-x-4">
         <img 
             src={layout.imageUrl} 
             alt={layout.title} 
-            className="w-24 h-24 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
+            className="w-16 h-16 object-cover rounded-md flex-shrink-0"
             onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/374151/FFFFFF?text=Img`; }}
         />
-        <div className="overflow-hidden flex-grow text-center sm:text-left min-w-0">
+        {/* This div is the key change. min-w-0 allows truncation to work inside the flex container. */}
+        <div className="flex-grow min-w-0">
             <h4 className="font-semibold text-white truncate">{layout.title}</h4>
-            <div className="flex items-center justify-center sm:justify-start space-x-2 mt-1">
+            <div className="flex items-center space-x-2 mt-1">
                 <p className="text-sm text-gray-400">TH {layout.townhallLevel}</p>
                 <StatusBadge status={layout.status} />
             </div>
         </div>
-        {/* Admin action buttons only show for pending bases */}
+        {/* Admin action buttons */}
         {isAdmin && layout.status === 'PENDING' && (
-            <div className="flex space-x-2 flex-shrink-0 w-full sm:w-auto">
-                <button onClick={() => onApprove(layout.id)} className="flex-1 sm:flex-initial bg-green-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-green-700">Approve</button>
-                <button onClick={() => onReject(layout.id)} className="flex-1 sm:flex-initial bg-red-600 text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-red-700">Reject</button>
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 flex-shrink-0">
+                <button onClick={() => onApprove(layout.id)} className="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-green-700">Approve</button>
+                <button onClick={() => onReject(layout.id)} className="bg-red-600 text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-red-700">Reject</button>
             </div>
         )}
     </div>
