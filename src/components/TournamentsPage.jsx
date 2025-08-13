@@ -8,15 +8,26 @@ const TournamentCard = ({ tournament, onViewDetails }) => {
         year: 'numeric', month: 'long', day: 'numeric'
     });
 
+    const getStatusInfo = (status) => {
+        switch (status) {
+            case 'IN_PROGRESS':
+                return { text: 'In Progress', color: 'bg-blue-500/20 text-blue-400' };
+            case 'COMPLETED':
+                return { text: 'Completed', color: 'bg-gray-500/20 text-gray-400' };
+            case 'REGISTRATION_OPEN':
+            default:
+                return { text: 'Registration Open', color: 'bg-green-500/20 text-green-400' };
+        }
+    };
+    const statusInfo = getStatusInfo(tournament.status);
+
     return (
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 flex flex-col">
-            <div className={`p-4 sm:p-6 flex-grow flex flex-col ${isUpcoming ? 'border-t-4 border-green-500' : 'border-t-4 border-gray-600'}`}>
+            <div className={`p-4 sm:p-6 flex-grow flex flex-col border-t-4 ${statusInfo.color.replace('bg-', 'border-').split('/')[0]}`}>
                 <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg sm:text-xl font-bold text-white">{tournament.name}</h3>
-                    <span className={`flex-shrink-0 ml-2 px-3 py-1 text-xs font-semibold rounded-full ${
-                        isUpcoming ? 'bg-green-500/20 text-green-400' : 'bg-gray-600 text-gray-400'
-                    }`}>
-                        {isUpcoming ? 'Upcoming' : 'Finished'}
+                    <span className={`flex-shrink-0 ml-2 px-3 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}>
+                        {statusInfo.text}
                     </span>
                 </div>
                 <p className="text-gray-400 mb-4 text-sm sm:text-base">{tournament.gameName}</p>
@@ -28,7 +39,7 @@ const TournamentCard = ({ tournament, onViewDetails }) => {
                 </div>
 
                 <button 
-                    onClick={() => onViewDetails(tournament.id)}
+                    onClick={() => onViewDetails(tournament)}
                     className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     View Details
                 </button>

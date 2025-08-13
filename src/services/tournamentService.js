@@ -43,12 +43,36 @@ const getRegistrationsForTournament = (tournamentId) => {
     });
 };
 
+/**
+ * NEW: Sends a request to start the tournament and generate matches.
+ * @param {number} tournamentId The ID of the tournament to start.
+ */
+const startTournament = (tournamentId) => {
+    return axios.post(`${API_BASE_URL}/tournaments/${tournamentId}/start`, {}, {
+        headers: getAuthHeaders()
+    });
+};
+
+/**
+ * ✅ NEW: Declares a winner for a specific match.
+ * @param {number} tournamentId The ID of the tournament.
+ * @param {number} matchId The ID of the match to update.
+ * @param {object} data The request body, containing { winnerTeamId }.
+ */
+const declareWinner = (tournamentId, matchId, data) => {
+    return axios.post(`${API_BASE_URL}/tournaments/${tournamentId}/matches/${matchId}/winner`, data, {
+        headers: getAuthHeaders()
+    });
+};
+
 const tournamentService = {
   getAllTournaments,
   createTournament,
   getTournamentById, 
   registerTeam,     
-  getRegistrationsForTournament 
+  getRegistrationsForTournament,
+  startTournament,
+  declareWinner 
 };
 
 export default tournamentService;

@@ -7,7 +7,7 @@ const Navbar = ({ onLogout, onNavigate }) => {
 
   const handleNavigate = (page) => {
     onNavigate(page);
-    setMobileMenuOpen(false); // Close menu on navigation
+    setMobileMenuOpen(false); 
   };
 
   return (
@@ -22,17 +22,17 @@ const Navbar = ({ onLogout, onNavigate }) => {
 
         {/* Desktop Menu - Hidden on small screens */}
         <div className="hidden md:flex space-x-4 items-center">
-          <button onClick={() => handleNavigate('home')} className="text-gray-300 hover:text-blue-400 transition-colors">Home</button>
-          <button onClick={() => handleNavigate('tournaments')} className="text-gray-300 hover:text-blue-400 transition-colors">Tournaments</button>
+          <button onClick={() => handleNavigate('home')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Home</button>
+          <button onClick={() => handleNavigate('tournaments')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Tournaments</button>
           {user ? (
             <>
-              <button onClick={() => handleNavigate('submit')} className="text-gray-300 hover:text-blue-400 transition-colors">Submit Base</button>
-              <button onClick={onLogout} className="text-gray-300 hover:text-red-400 transition-colors">Logout</button>
+              <button onClick={() => handleNavigate('submit')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Submit Base</button>
+              <button onClick={onLogout} className="text-gray-300 hover:text-red-400 transition-colors cursor-pointer">Logout</button>
             </>
           ) : (
             <>
-              <button onClick={() => handleNavigate('login')} className="text-gray-300 hover:text-blue-400 transition-colors">Login</button>
-              <button onClick={() => handleNavigate('register')} className="text-white bg-blue-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors">Register</button>
+              <button onClick={() => handleNavigate('login')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Login</button>
+              <button onClick={() => handleNavigate('register')} className="text-white bg-blue-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors cursor-pointer">Register</button>
             </>
           )}
         </div>

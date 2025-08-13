@@ -74,10 +74,41 @@ const getAll = (pageable, townhallLevel) => {
     return axios.get(`${API_BASE_URL}/bases?${params.toString()}`);
 };
 
+/**
+ * ✅ NEW: Fetches a paginated list of bases awaiting admin approval.
+ */
+const getPendingBases = (page = 0, size = 10) => {
+    return axios.get(`${API_BASE_URL}/bases/pending?page=${page}&size=${size}`, {
+        headers: getAuthHeaders(),
+    });
+};
+
+/**
+ * ✅ NEW: Sends a request to approve a base.
+ */
+const approveBase = (baseId) => {
+    return axios.post(`${API_BASE_URL}/bases/${baseId}/approve`, {}, {
+        headers: getAuthHeaders(),
+    });
+};
+
+/**
+ * ✅ NEW: Sends a request to reject a base.
+ */
+const rejectBase = (baseId) => {
+    return axios.post(`${API_BASE_URL}/bases/${baseId}/reject`, {}, {
+        headers: getAuthHeaders(),
+    });
+};
+
+
 const baseLayoutService = {
   createBase,
   getMyBases, 
-  getAll
+  getAll,
+  getPendingBases,
+  approveBase,
+  rejectBase
 };
 
 export default baseLayoutService;

@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import tournamentService from '../services/tournamentService'; // Assuming you have this service
-import { useAuth } from '../context/AuthContext'; // Assuming you have this context
+import tournamentService from '../services/tournamentService'; 
+import { useAuth } from '../context/AuthContext'; 
 
-// A component to display the user's existing registration details
 const RegistrationDetails = ({ registration }) => (
     <div className="bg-green-900/50 border border-green-700 p-6 rounded-lg">
         <h4 className="text-xl font-bold text-green-300 mb-4">You Are Registered!</h4>
         <p className="text-gray-300 mb-4">Here are the details you submitted:</p>
         
         <div className="space-y-4">
-            {/* Team Details */}
             <div>
                 <h5 className="font-semibold text-gray-200 mb-2">Team Details</h5>
                 <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
@@ -19,7 +17,6 @@ const RegistrationDetails = ({ registration }) => (
                 </div>
             </div>
 
-            {/* Player Details */}
             {registration.playerSubmissions.map((player, index) => (
                  <div key={player.playerSubmissionId}>
                     <h5 className="font-semibold text-gray-200 mb-2 mt-3">Player {index + 1}</h5>
@@ -41,23 +38,29 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const isAdmin = user && user.roles.includes('ROLE_ADMIN');
     
     const [formValues, setFormValues] = useState({});
 
+    const fetchTournament = async () => {
+        try {
+            setLoading(true);
+            const response = await tournamentService.getTournamentById(tournamentId);
+            console.log("detail data -------------- ",response);
+            setTournament(response.data);
+        } catch (err) {
+            setError('Failed to load tournament details.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchTournament = async () => {
-            try {
-                const response = await tournamentService.getTournamentById(tournamentId);
-                setTournament(response.data);
-            } catch (err) {
-                setError('Failed to load tournament details.');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchTournament();
-    }, [tournamentId, success]); // Re-fetch on success to show new registration
+    }, [tournamentId,success]);
+
+    
+
 
     const handleInputChange = (fieldId, value) => {
         setFormValues(prev => ({ ...prev, [fieldId]: value }));
@@ -144,10 +147,12 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
     const isTournamentFinished = tournament && new Date(tournament.startDate) < new Date();
     const { teamFields, playerFields } = getGroupedFields();
 
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8">
                 <h2 className="text-3xl font-bold text-white mb-2">{tournament.name}</h2>
+                
                 <p className="text-gray-400 mb-6">{tournament.rules}</p>
                 
                 <h3 className="text-2xl font-bold text-white mb-4 border-t border-gray-700 pt-6">Registration</h3>

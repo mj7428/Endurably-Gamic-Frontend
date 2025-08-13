@@ -13,6 +13,7 @@ import { useAuth } from './context/AuthContext';
 import baseLayoutService from './services/baseLayoutService';
 import Footer from './components/Footer';
 import { PrivacyPolicyPage, TermsOfServicePage } from './components/LegalPages';
+import TournamentBracketPage from './components/TournamentBracketPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -85,14 +86,41 @@ function App() {
   const handleLoginSuccess = () => { login(); setCurrentPage('home'); };
   const handleLogout = () => { logout(); setCurrentPage('home'); };
   const navigateTo = (page) => { setActiveTournamentId(null); setCurrentPage(page); };
-  const viewTournamentDetails = (id) => {
-    setActiveTournamentId(id);
-    if (user && user.roles.includes('ROLE_ADMIN')) {
-      setCurrentPage('view-registrations');
+
+  const switchTournamentView = (page) => {
+    setCurrentPage(page);
+  };
+
+  
+  // const viewTournamentDetails = (id) => {
+  //   setActiveTournamentId(id);
+  //   if (user && user.roles.includes('ROLE_ADMIN')) {
+  //     setCurrentPage('view-registrations');
+  //   } else {
+  //     setCurrentPage('tournament-detail');
+  //   }
+  // };
+
+  const viewTournamentDetails = (tournament) => { // Pass the whole tournament object
+  setActiveTournamentId(tournament.id);
+  
+  if (user && user.roles.includes('ROLE_ADMIN')) {
+    // Admins see registrations if they are open, otherwise the bracket
+    if (tournament.status === 'REGISTRATION_OPEN') {
+        setCurrentPage('view-registrations');
     } else {
-      setCurrentPage('tournament-detail');
+        setCurrentPage('tournament-bracket'); // New page for bracket
+    }
+  } else {
+      // Users see the detail/registration page if open, otherwise the bracket
+      if (tournament.status === 'REGISTRATION_OPEN') {
+          setCurrentPage('tournament-detail');
+      } else {
+          setCurrentPage('tournament-bracket'); // New page for bracket
+      }
     }
   };
+
 
   const renderPage = () => {
     switch (currentPage) {
@@ -100,9 +128,10 @@ function App() {
       case 'register': return <Register onNavigate={navigateTo} />;
       case 'submit': return <SubmitBase />;
       case 'tournaments': return <TournamentsPage onNavigate={navigateTo} onViewDetails={viewTournamentDetails} />;
+      case 'tournament-bracket': return <TournamentBracketPage tournamentId={activeTournamentId} />;
       case 'create-tournament': return <CreateTournamentPage onNavigate={navigateTo}/>;
       case 'tournament-detail': return <TournamentDetailPage tournamentId={activeTournamentId} onNavigate={navigateTo} />;
-      case 'view-registrations': return <TournamentRegistrationsPage tournamentId={activeTournamentId} />;
+      case 'view-registrations':  return <TournamentRegistrationsPage tournamentId={activeTournamentId} onNavigate={switchTournamentView} />;
       case 'terms': return <TermsOfServicePage />;
       case 'privacy': return <PrivacyPolicyPage />;
       default:
