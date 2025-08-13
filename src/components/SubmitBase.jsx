@@ -29,9 +29,9 @@ const SubmissionCard = ({ layout, isAdmin, onApprove, onReject }) => (
             className="w-24 h-24 sm:w-16 sm:h-16 object-cover rounded-md flex-shrink-0"
             onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/374151/FFFFFF?text=Img`; }}
         />
-        <div className="overflow-hidden flex-grow text-center sm:text-left">
+        <div className="overflow-hidden flex-grow text-center sm:text-left min-w-0">
             <h4 className="font-semibold text-white truncate">{layout.title}</h4>
-            <div className="flex items-center justify-center sm:justify-start space-x-2">
+            <div className="flex items-center justify-center sm:justify-start space-x-2 mt-1">
                 <p className="text-sm text-gray-400">TH {layout.townhallLevel}</p>
                 <StatusBadge status={layout.status} />
             </div>
