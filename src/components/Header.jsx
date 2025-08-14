@@ -16,7 +16,7 @@ const Header = ({ activeTownHall, setActiveTownHall }) => {
                 onClick={() => setActiveTownHall(th)}
                 className={`flex-shrink-0 px-4 py-2 text-sm font-semibold rounded-full transition-colors ${
                   activeTownHall === th 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-red-600 text-white' 
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                 }`}
               >

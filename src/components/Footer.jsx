@@ -24,12 +24,12 @@ const Footer = ({ onNavigate }) => {
             </h3>
             <p className="mt-2 text-sm text-gray-400">Your #1 source for competitive base layouts.</p>
             <div className="mt-4 flex justify-center md:justify-start space-x-6">
-              <button onClick={() => onNavigate('home')} className="text-gray-300 hover:text-blue-400 text-sm">Home</button>
-              <button onClick={() => onNavigate('tournaments')} className="text-gray-300 hover:text-blue-400 text-sm">Tournaments</button>
+              <button onClick={() => onNavigate('home')} className="text-gray-300 hover:text-red-400 text-sm">Home</button>
+              <button onClick={() => onNavigate('tournaments')} className="text-gray-300 hover:text-red-400 text-sm">Tournaments</button>
               
               {/* ✅ This link will now only appear if a user is logged in */}
               {user && (
-                <button onClick={() => onNavigate('submit')} className="text-gray-300 hover:text-blue-400 text-sm">Submit Base</button>
+                <button onClick={() => onNavigate('submit')} className="text-gray-300 hover:text-red-400 text-sm">Submit Base</button>
               )}
             </div>
           </div>

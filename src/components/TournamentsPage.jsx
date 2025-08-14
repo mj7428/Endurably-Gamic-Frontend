@@ -11,7 +11,7 @@ const TournamentCard = ({ tournament, onViewDetails }) => {
     const getStatusInfo = (status) => {
         switch (status) {
             case 'IN_PROGRESS':
-                return { text: 'In Progress', color: 'bg-blue-500/20 text-blue-400' };
+                return { text: 'In Progress', color: 'bg-yellow-500/20 text-yellow-400' };
             case 'COMPLETED':
                 return { text: 'Completed', color: 'bg-gray-500/20 text-gray-400' };
             case 'REGISTRATION_OPEN':
@@ -40,7 +40,7 @@ const TournamentCard = ({ tournament, onViewDetails }) => {
 
                 <button 
                     onClick={() => onViewDetails(tournament)}
-                    className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    className="mt-6 w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors">
                     View Details
                 </button>
             </div>
@@ -80,7 +80,7 @@ const TournamentsPage = ({ onNavigate, onViewDetails }) => {
                 {isAdmin && (
                     <button 
                         onClick={() => onNavigate('create-tournament')} 
-                        className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-green-700 transition-transform hover:scale-105"
+                        className="w-full sm:w-auto bg-red-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-red-700 transition-transform hover:scale-105"
                     >
                         Create New Tournament
                     </button>

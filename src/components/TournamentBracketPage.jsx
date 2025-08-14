@@ -4,7 +4,7 @@ import tournamentService from '../services/tournamentService';
 import { useAuth } from '../context/AuthContext';
 
 // ============================================================================
-// NEW: Component to display the tournament winner
+// Redesigned component to display the tournament winner
 // ============================================================================
 const TournamentWinnerBanner = ({ winnerTeam, prizePool }) => {
     if (!winnerTeam) return null;
@@ -15,21 +15,21 @@ const TournamentWinnerBanner = ({ winnerTeam, prizePool }) => {
     };
 
     return (
-        <div className="mb-8 p-6 bg-gray-800 border border-yellow-500 rounded-xl shadow-2xl text-center relative overflow-hidden">
+        <div className="mb-8 p-6 bg-gray-800 border border-red-500 rounded-xl shadow-2xl text-center relative overflow-hidden">
             {/* Background Glow Effect */}
-            <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-yellow-500/30 via-transparent to-yellow-500/30 animate-spin-slow"></div>
+            <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-red-500/30 via-transparent to-red-500/30 animate-spin-slow"></div>
             
             <div className="relative z-10">
                 <div className="flex justify-center items-center mb-3">
                     <span className="text-5xl mr-4">🏆</span>
                     <div>
-                        <h3 className="text-xl font-semibold text-yellow-300 tracking-wider">TOURNAMENT CHAMPION</h3>
+                        <h3 className="text-xl font-semibold text-red-300 tracking-wider">TOURNAMENT CHAMPION</h3>
                         <p className="text-4xl font-extrabold text-white tracking-wider mt-1">{getTeamName(winnerTeam)}</p>
                     </div>
                 </div>
                 {prizePool && (
-                    <div className="mt-4 pt-3 border-t border-yellow-600/50">
-                        <p className="font-semibold text-yellow-200">Prize: <span className="font-normal text-white">{prizePool}</span></p>
+                    <div className="mt-4 pt-3 border-t border-red-600/50">
+                        <p className="font-semibold text-red-200">Prize: <span className="font-normal text-white">{prizePool}</span></p>
                     </div>
                 )}
             </div>
@@ -40,7 +40,7 @@ const TournamentWinnerBanner = ({ winnerTeam, prizePool }) => {
 
 
 // ============================================================================
-// MatchCard Component (No changes needed)
+// MatchCard Component
 // ============================================================================
 const MatchCard = ({ match, onDeclareWinner, tournamentId }) => {
     const { user } = useAuth();
@@ -58,7 +58,7 @@ const MatchCard = ({ match, onDeclareWinner, tournamentId }) => {
             {isAdmin && !match.winner && team && match.status !== 'COMPLETED' && (
                  <button 
                     onClick={() => onDeclareWinner(match.id, team.registrationId)}
-                    className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded ml-2 flex-shrink-0"
+                    className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded ml-2 flex-shrink-0"
                  >
                      Set Winner
                  </button>
@@ -80,7 +80,7 @@ const MatchCard = ({ match, onDeclareWinner, tournamentId }) => {
 
 
 // ============================================================================
-// Main TournamentBracketPage Component (Updated)
+// Main TournamentBracketPage Component
 // ============================================================================
 const TournamentBracketPage = ({ tournamentId }) => {
     const [tournament, setTournament] = useState(null);
@@ -145,18 +145,19 @@ const TournamentBracketPage = ({ tournamentId }) => {
     if (!tournament) return null;
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 relative">
             {showConfetti && (
                 <Confetti
                     width={window.innerWidth}
                     height={window.innerHeight}
                     recycle={false}
-                    numberOfPieces={1000}
+                    numberOfPieces={400}
                     onConfettiComplete={() => setShowConfetti(false)}
                 />
             )}
+
             <h2 className="text-3xl font-bold text-white text-center mb-2">{tournament.name}</h2>
-            <p className="text-center text-gray-400 mb-8">Status: <span className="font-semibold text-yellow-400">{tournament.status.replace('_', ' ')}</span></p>
+            <p className="text-center text-gray-400 mb-8">Status: <span className="font-semibold text-red-400">{tournament.status.replace('_', ' ')}</span></p>
 
             {tournamentWinner && <TournamentWinnerBanner winnerTeam={tournamentWinner} prizePool={tournament.prizePool}/>}
 

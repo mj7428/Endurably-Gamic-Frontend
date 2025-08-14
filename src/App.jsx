@@ -91,16 +91,6 @@ function App() {
     setCurrentPage(page);
   };
 
-  
-  // const viewTournamentDetails = (id) => {
-  //   setActiveTournamentId(id);
-  //   if (user && user.roles.includes('ROLE_ADMIN')) {
-  //     setCurrentPage('view-registrations');
-  //   } else {
-  //     setCurrentPage('tournament-detail');
-  //   }
-  // };
-
   const viewTournamentDetails = (tournament) => { // Pass the whole tournament object
   setActiveTournamentId(tournament.id);
   

@@ -15,24 +15,24 @@ const Navbar = ({ onLogout, onNavigate }) => {
       <div className="container mx-auto flex justify-between items-center">
         <button 
           onClick={() => handleNavigate('home')} 
-          className="text-xl sm:text-2xl font-bold text-white font-display tracking-wider"
+          className="text-xl sm:text-2xl font-bold text-red-500 font-display tracking-wider"
         >
           ENDURABLY GAMIC
         </button>
 
         {/* Desktop Menu - Hidden on small screens */}
         <div className="hidden md:flex space-x-4 items-center">
-          <button onClick={() => handleNavigate('home')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Home</button>
-          <button onClick={() => handleNavigate('tournaments')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Tournaments</button>
+          <button onClick={() => handleNavigate('home')} className="text-gray-300 hover:text-red-500 transition-colors">Home</button>
+          <button onClick={() => handleNavigate('tournaments')} className="text-gray-300 hover:text-red-500 transition-colors">Tournaments</button>
           {user ? (
             <>
-              <button onClick={() => handleNavigate('submit')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Submit Base</button>
-              <button onClick={onLogout} className="text-gray-300 hover:text-red-400 transition-colors cursor-pointer">Logout</button>
+              <button onClick={() => handleNavigate('submit')} className="text-gray-300 hover:text-red-500 transition-colors">Submit Base</button>
+              <button onClick={onLogout} className="text-gray-300 hover:text-red-500 transition-colors">Logout</button>
             </>
           ) : (
             <>
-              <button onClick={() => handleNavigate('login')} className="text-gray-300 hover:text-blue-400 transition-colors cursor-pointer">Login</button>
-              <button onClick={() => handleNavigate('register')} className="text-white bg-blue-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors cursor-pointer">Register</button>
+              <button onClick={() => handleNavigate('login')} className="text-gray-300 hover:text-red-500 transition-colors">Login</button>
+              <button onClick={() => handleNavigate('register')} className="text-white bg-red-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-red-700 transition-colors">Register</button>
             </>
           )}
         </div>
@@ -51,17 +51,17 @@ const Navbar = ({ onLogout, onNavigate }) => {
       {isMobileMenuOpen && (
         <div className="md:hidden mt-4 bg-gray-700 rounded-lg p-4">
           <div className="flex flex-col space-y-4">
-            <button onClick={() => handleNavigate('home')} className="text-gray-200 hover:text-blue-400 text-left">Home</button>
-            <button onClick={() => handleNavigate('tournaments')} className="text-gray-200 hover:text-blue-400 text-left">Tournaments</button>
+            <button onClick={() => handleNavigate('home')} className="text-gray-200 hover:text-red-400 text-left">Home</button>
+            <button onClick={() => handleNavigate('tournaments')} className="text-gray-200 hover:text-red-400 text-left">Tournaments</button>
             {user ? (
               <>
-                <button onClick={() => handleNavigate('submit')} className="text-gray-200 hover:text-blue-400 text-left">Submit Base</button>
+                <button onClick={() => handleNavigate('submit')} className="text-gray-200 hover:text-red-400 text-left">Submit Base</button>
                 <button onClick={onLogout} className="text-gray-200 hover:text-red-400 text-left">Logout</button>
               </>
             ) : (
               <>
-                <button onClick={() => handleNavigate('login')} className="text-gray-200 hover:text-blue-400 text-left">Login</button>
-                <button onClick={() => handleNavigate('register')} className="w-full text-white bg-blue-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-700">Register</button>
+                <button onClick={() => handleNavigate('login')} className="text-gray-200 hover:text-red-400 text-left">Login</button>
+                <button onClick={() => handleNavigate('register')} className="w-full text-white bg-red-600 px-4 py-2 rounded-md text-sm font-semibold hover:bg-red-700">Register</button>
               </>
             )}
           </div>

@@ -53,7 +53,7 @@ const Login = ({ onLoginSuccess, onNavigate }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                 placeholder="you@example.com"
               />
             </div>
@@ -70,7 +70,7 @@ const Login = ({ onLoginSuccess, onNavigate }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                 placeholder="••••••••"
               />
             </div>
@@ -80,7 +80,7 @@ const Login = ({ onLoginSuccess, onNavigate }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-all duration-300 transform hover:scale-105"
+              className="w-full py-3 px-4 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-all duration-300 transform hover:scale-105"
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>
@@ -90,7 +90,7 @@ const Login = ({ onLoginSuccess, onNavigate }) => {
               <button 
                 type="button" 
                 onClick={() => onNavigate('register')} 
-                className="font-medium text-blue-400 hover:underline"
+                className="font-medium text-red-400 hover:underline"
               >
                 Sign Up
               </button>

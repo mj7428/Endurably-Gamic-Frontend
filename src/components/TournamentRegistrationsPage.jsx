@@ -7,7 +7,7 @@ const TeamRegistrationCard = ({ registration }) => {
     const otherTeamFields = registration.teamFields.filter(f => f !== teamNameField);
 
     return (
-        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-blue-500/30">
+        <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-red-500/30">
             <div className="p-4 bg-gray-700/50 border-b-2 border-gray-700">
                 <h3 className="text-lg font-bold text-white truncate">{teamNameField ? teamNameField.value : 'Unnamed Team'}</h3>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mt-2">
@@ -25,7 +25,7 @@ const TeamRegistrationCard = ({ registration }) => {
                 <div className="space-y-3">
                     {registration.playerSubmissions.map((player, index) => (
                         <div key={player.playerSubmissionId} className="bg-gray-900/50 p-3 rounded-md border-l-4 border-gray-600">
-                            <p className="font-bold text-sm text-blue-400 mb-2">Player {index + 1}</p>
+                            <p className="font-bold text-sm text-red-400 mb-2">Player {index + 1}</p>
                             <div className="space-y-1">
                                 {player.fieldValues.map(field => (
                                     <div key={field.fieldName} className="flex justify-between text-xs">
@@ -98,7 +98,7 @@ const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
 
             {/* ADMIN ACTION SECTION */}
             {isAdmin && isRegistrationOpen && (
-                <div className="mb-8 p-4 bg-blue-900/50 border border-blue-700 rounded-lg text-center">
+                <div className="mb-8 p-4 bg-red-900/20 border border-red-700 rounded-lg text-center">
                     <h4 className="font-bold text-lg text-white">Admin Action</h4>
                     
                     {registrations.length < 2 ? (
@@ -108,11 +108,11 @@ const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
                         </p>
                     ) : (
                         <>
-                            <p className="text-blue-300 text-sm my-2">This tournament is ready to begin. Starting the tournament will close registrations and generate the first round of matches.</p>
+                            <p className="text-red-300 text-sm my-2">This tournament is ready to begin. Starting the tournament will close registrations and generate the first round of matches.</p>
                             <button 
                                 onClick={handleStartTournament}
                                 disabled={loading}
-                                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-500"
+                                className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 disabled:bg-gray-500"
                             >
                                 {loading ? 'Starting...' : 'Start Tournament'}
                             </button>

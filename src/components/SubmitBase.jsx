@@ -29,7 +29,6 @@ const SubmissionCard = ({ layout, isAdmin, onApprove, onReject }) => (
             className="w-16 h-16 object-cover rounded-md flex-shrink-0"
             onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/100x100/374151/FFFFFF?text=Img`; }}
         />
-        {/* This div is the key change. min-w-0 allows truncation to work inside the flex container. */}
         <div className="flex-grow min-w-0">
             <h4 className="font-semibold text-white truncate">{layout.title}</h4>
             <div className="flex items-center space-x-2 mt-1">
@@ -37,7 +36,6 @@ const SubmissionCard = ({ layout, isAdmin, onApprove, onReject }) => (
                 <StatusBadge status={layout.status} />
             </div>
         </div>
-        {/* Admin action buttons */}
         {isAdmin && layout.status === 'PENDING' && (
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 flex-shrink-0">
                 <button onClick={() => onApprove(layout.id)} className="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-semibold hover:bg-green-700">Approve</button>
@@ -69,7 +67,7 @@ const SubmitBase = () => {
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingBases, setIsLoadingBases] = useState(true);
     const [listVersion, setListVersion] = useState(0);
-    const [filterMode, setFilterMode] = useState('myBases'); // 'myBases' or 'pending'
+    const [filterMode, setFilterMode] = useState('myBases');
 
     const observer = useRef();
     const lastBaseElementRef = useCallback(node => {
@@ -83,7 +81,6 @@ const SubmitBase = () => {
         if (node) observer.current.observe(node);
     }, [isLoadingBases, hasMore]);
 
-    // Effect to fetch bases based on filter mode
     useEffect(() => {
         if (!hasMore && page > 0) return;
         setIsLoadingBases(true);
@@ -106,7 +103,6 @@ const SubmitBase = () => {
         fetchBases();
     }, [page, listVersion, filterMode]);
 
-    // Effect to reset list when filter changes
     useEffect(() => {
         setBases([]);
         setPage(0);
@@ -155,28 +151,27 @@ const SubmitBase = () => {
                     <div className="bg-gray-800 p-6 md:p-8 rounded-lg shadow-lg">
                         <h2 className="text-2xl font-bold text-white mb-6 text-center">Submit a New Base</h2>
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* Form inputs remain the same */}
                             <div>
                                 <label htmlFor="title" className="block text-sm font-medium text-gray-300">Title</label>
-                                <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                                <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} required className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
                             </div>
                             <div>
                                 <label htmlFor="townhallLevel" className="block text-sm font-medium text-gray-300">Town Hall Level</label>
-                                <input type="number" id="townhallLevel" value={townhallLevel} onChange={(e) => setTownhallLevel(e.target.value)} required min="1" max="17" className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                                <input type="number" id="townhallLevel" value={townhallLevel} onChange={(e) => setTownhallLevel(e.target.value)} required min="1" max="17" className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
                             </div>
                             <div>
                                 <label htmlFor="baseLink" className="block text-sm font-medium text-gray-300">Base Link</label>
-                                <input type="url" id="baseLink" value={baseLink} onChange={(e) => setBaseLink(e.target.value)} required className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                                <input type="url" id="baseLink" value={baseLink} onChange={(e) => setBaseLink(e.target.value)} required className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition" />
                             </div>
                             <div>
                                 <label htmlFor="image" className="block text-sm font-medium text-gray-300">Image Screenshot</label>
-                                <input type="file" id="image" onChange={(e) => setImageFile(e.target.files[0])} required accept="image/png, image/jpeg" className="mt-1 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700" />
+                                <input type="file" id="image" onChange={(e) => setImageFile(e.target.files[0])} required accept="image/png, image/jpeg" className="mt-1 w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700" />
                             </div>
                             
                             {formError && <p className="text-sm text-red-400 text-center">{formError}</p>}
                             {formSuccess && <p className="text-sm text-green-400 text-center">{formSuccess}</p>}
                             
-                            <button type="submit" disabled={isSubmitting} className="w-full py-3 px-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-500 transition-all">
+                            <button type="submit" disabled={isSubmitting} className="w-full py-3 px-4 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-gray-500 transition-all">
                                 {isSubmitting ? 'Submitting...' : 'Submit for Review'}
                             </button>
                         </form>
@@ -184,11 +179,10 @@ const SubmitBase = () => {
                 </div>
 
                 <div className="flex flex-col space-y-4">
-                    {/* Admin Filter Controls */}
                     {isAdmin && (
                         <div className="bg-gray-800 p-2 rounded-lg flex space-x-2">
-                            <button onClick={() => setFilterMode('myBases')} className={`flex-1 py-2 text-sm font-semibold rounded-md ${filterMode === 'myBases' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>My Submissions</button>
-                            <button onClick={() => setFilterMode('pending')} className={`flex-1 py-2 text-sm font-semibold rounded-md ${filterMode === 'pending' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>Pending Review</button>
+                            <button onClick={() => setFilterMode('myBases')} className={`flex-1 py-2 text-sm font-semibold rounded-md ${filterMode === 'myBases' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'}`}>My Submissions</button>
+                            <button onClick={() => setFilterMode('pending')} className={`flex-1 py-2 text-sm font-semibold rounded-md ${filterMode === 'pending' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'}`}>Pending Review</button>
                         </div>
                     )}
                     

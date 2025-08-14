@@ -2,25 +2,28 @@ import React, { useState, useEffect } from 'react';
 import tournamentService from '../services/tournamentService'; 
 import { useAuth } from '../context/AuthContext'; 
 
+// A component to display the user's existing registration details
 const RegistrationDetails = ({ registration }) => (
-    <div className="bg-green-900/50 border border-green-700 p-6 rounded-lg">
-        <h4 className="text-xl font-bold text-green-300 mb-4">You Are Registered!</h4>
+    <div className="bg-red-900/50 border border-red-700 p-6 rounded-lg">
+        <h4 className="text-xl font-bold text-red-300 mb-4">You Are Registered!</h4>
         <p className="text-gray-300 mb-4">Here are the details you submitted:</p>
         
         <div className="space-y-4">
+            {/* Team Details */}
             <div>
                 <h5 className="font-semibold text-gray-200 mb-2">Team Details</h5>
-                <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
+                <div className="pl-4 border-l-2 border-red-500 space-y-1 text-sm">
                     {registration.teamFields.map(field => (
                         <p key={field.fieldName}><span className="text-gray-400">{field.fieldName}:</span> {field.value}</p>
                     ))}
                 </div>
             </div>
 
+            {/* Player Details */}
             {registration.playerSubmissions.map((player, index) => (
                  <div key={player.playerSubmissionId}>
                     <h5 className="font-semibold text-gray-200 mb-2 mt-3">Player {index + 1}</h5>
-                    <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
+                    <div className="pl-4 border-l-2 border-red-500 space-y-1 text-sm">
                         {player.fieldValues.map(field => (
                             <p key={field.fieldName}><span className="text-gray-400">{field.fieldName.replace(`Player ${index + 1} `, '')}:</span> {field.value}</p>
                         ))}
@@ -46,7 +49,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         try {
             setLoading(true);
             const response = await tournamentService.getTournamentById(tournamentId);
-            console.log("detail data -------------- ",response);
             setTournament(response.data);
         } catch (err) {
             setError('Failed to load tournament details.');
@@ -57,9 +59,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
 
     useEffect(() => {
         fetchTournament();
-    }, [tournamentId,success]);
-
-    
+    }, [tournamentId, success]); 
 
 
     const handleInputChange = (fieldId, value) => {
@@ -162,7 +162,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                 {!user ? (
                     <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
                         <p>You must be logged in to register for this tournament.</p>
-                        <button onClick={() => onNavigate('login')} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        <button onClick={() => onNavigate('login')} className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
                             Login
                         </button>
                     </div>
@@ -187,7 +187,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                                             type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
                                             onChange={(e) => handleInputChange(field.id, e.target.value)}
                                             required={field.isRequired}
-                                            className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                            className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                                         />
                                     </div>
                                 ))}
@@ -208,7 +208,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                                                 type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
                                                 onChange={(e) => handleInputChange(field.id, e.target.value)}
                                                 required={field.isRequired}
-                                                className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                                className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition"
                                             />
                                         </div>
                                     ))}
@@ -218,7 +218,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
 
                         {error && <p className="text-sm text-red-400 text-center">{error}</p>}
                         
-                        <button type="submit" disabled={loading} className="w-full py-3 mt-6 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-500">
+                        <button type="submit" disabled={loading} className="w-full py-3 mt-6 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-gray-500">
                             {loading ? 'Submitting...' : 'Register Team'}
                         </button>
                     </form>
