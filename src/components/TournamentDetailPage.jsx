@@ -224,6 +224,10 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                     </form>
                 )}
             </div>
+            <RelevantVideos 
+                searchTerm={tournament.name} 
+                title="Tournament Winners" 
+            />
         </div>
     );
 };

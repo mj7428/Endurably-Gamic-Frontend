@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import tournamentService from '../services/tournamentService';
 import { useAuth } from '../context/AuthContext';
+import RelevantVideos from './RelevantVideos';
 
 const TournamentCard = ({ tournament, onViewDetails }) => {
     const isUpcoming = new Date(tournament.startDate) > new Date();
@@ -91,6 +92,10 @@ const TournamentsPage = ({ onNavigate, onViewDetails }) => {
                     <TournamentCard key={tournament.id} tournament={tournament} onViewDetails={onViewDetails} />
                 ))}
             </div>
+            <RelevantVideos 
+                searchTerm={"tournament"} 
+                title="Tournament Highlights" 
+            />
         </div>
     );
 };

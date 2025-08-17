@@ -14,6 +14,8 @@ import baseLayoutService from './services/baseLayoutService';
 import Footer from './components/Footer';
 import { PrivacyPolicyPage, TermsOfServicePage } from './components/LegalPages';
 import TournamentBracketPage from './components/TournamentBracketPage';
+import RelevantVideos from './components/RelevantVideos';
+import RecentVideos from './components/RecentVideos';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -135,6 +137,11 @@ function App() {
                 error={error} 
                 lastBaseElementRef={lastBaseElementRef}
               />
+              <RelevantVideos 
+                searchTerm={`TH${activeTownHall} Attack Strategy`} 
+                title={`TH${activeTownHall} Attack Strategies`}
+              />
+              <RecentVideos />
                {error && <div>{error}</div>}
             </main>
           </>
