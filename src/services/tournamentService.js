@@ -59,8 +59,8 @@ const startTournament = (tournamentId) => {
  * @param {number} matchId The ID of the match to update.
  * @param {object} data The request body, containing { winnerTeamId }.
  */
-const declareWinner = (tournamentId, matchId, data) => {
-    return axios.post(`${API_BASE_URL}/tournaments/${tournamentId}/matches/${matchId}/winner`, data, {
+const declareWinner = (tournamentId, roundNumber, matchNumber, data) => {
+    return axios.post(`${API_BASE_URL}/tournaments/${tournamentId}/rounds/${roundNumber}/matches/${matchNumber}/winner`, data, {
         headers: getAuthHeaders()
     });
 };

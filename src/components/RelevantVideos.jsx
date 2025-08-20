@@ -16,7 +16,8 @@ const RelevantVideos = ({ searchTerm, title }) => {
             setLoading(true);
             setError('');
             try {
-                const response = await youtubeService.searchVideos(searchTerm);
+                const response = null;
+                // await youtubeService.searchVideos(searchTerm);
                 setVideoIds(response.data);
             } catch (err) {
                 console.error("Failed to fetch YouTube videos:", err);

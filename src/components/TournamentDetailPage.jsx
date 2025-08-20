@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import tournamentService from '../services/tournamentService'; 
 import { useAuth } from '../context/AuthContext'; 
+import RelevantVideos from './RelevantVideos';
 
 // A component to display the user's existing registration details
 const RegistrationDetails = ({ registration }) => (
@@ -78,6 +79,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         };
         const playersMap = {};
 
+        // ✅ This logic is now corrected to build the proper payload
         tournament.requiredFields.forEach(field => {
             const value = formValues[field.id];
             if (!value && field.isRequired) {
@@ -86,8 +88,9 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             }
             if (!value) return;
 
+            // Create the object with fieldName and value
             const fieldValue = {
-                fieldDefinitionId: field.id,
+                fieldName: field.fieldName, // The crucial fix
                 value: value
             };
 
@@ -122,7 +125,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             setLoading(false);
         }
     };
-
+    
     const getGroupedFields = () => {
         if (!tournament) return { teamFields: [], playerFields: [] };
         

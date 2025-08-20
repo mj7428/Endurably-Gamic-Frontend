@@ -42,7 +42,7 @@ const TournamentWinnerBanner = ({ winnerTeam, prizePool }) => {
 // ============================================================================
 // MatchCard Component
 // ============================================================================
-const MatchCard = ({ match, onDeclareWinner, tournamentId }) => {
+const MatchCard = ({ match, onDeclareWinner }) => {
     const { user } = useAuth();
     const isAdmin = user && user.roles.includes('ROLE_ADMIN');
 
@@ -57,7 +57,7 @@ const MatchCard = ({ match, onDeclareWinner, tournamentId }) => {
             <span className="truncate">{getTeamName(team)}</span>
             {isAdmin && !match.winner && team && match.status !== 'COMPLETED' && (
                  <button 
-                    onClick={() => onDeclareWinner(match.id, team.registrationId)}
+                    onClick={() => onDeclareWinner(match, team.registrationId)}
                     className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded ml-2 flex-shrink-0"
                  >
                      Set Winner
@@ -98,6 +98,7 @@ const TournamentBracketPage = ({ tournamentId }) => {
             if (!tournament) setLoading(true);
             const response = await tournamentService.getTournamentById(tournamentId);
             setTournament(response.data);
+            
         } catch (err) {
             setError('Failed to load tournament details.');
             console.error(err);
@@ -110,9 +111,9 @@ const TournamentBracketPage = ({ tournamentId }) => {
         fetchTournamentData();
     }, [fetchTournamentData]);
 
-    const handleDeclareWinner = async (matchId, winnerTeamId) => {
+    const handleDeclareWinner = async (match, winnerTeamId) => {
         try {
-            await tournamentService.declareWinner(tournamentId, matchId, { winnerTeamId });
+            await tournamentService.declareWinner(tournament.id, match.roundNumber, match.matchNumber, { winnerTeamId });
             fetchTournamentData(); 
         } catch (err) {
             console.error("Failed to declare winner", err);
@@ -168,10 +169,9 @@ const TournamentBracketPage = ({ tournamentId }) => {
                         <div className="space-y-4">
                             {matches.map(match => (
                                 <MatchCard 
-                                    key={match.id} 
+                                    key={`${match.roundNumber}-${match.matchNumber}`} 
                                     match={match} 
                                     onDeclareWinner={handleDeclareWinner}
-                                    tournamentId={tournamentId}
                                 />
                             ))}
                         </div>
