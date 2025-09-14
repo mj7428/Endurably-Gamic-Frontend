@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import tournamentService from '../services/tournamentService';
 
+// InputField component defined outside to prevent re-creation on every render
 const InputField = ({ id, label, type = "text", value, onChange, required, min, icon, inputStyle }) => (
     <div>
         <label htmlFor={id} className="block text-sm font-medium text-gray-300">{label}</label>
@@ -13,7 +15,8 @@ const InputField = ({ id, label, type = "text", value, onChange, required, min, 
     </div>
 );
 
-const CreateTournamentPage = ({ onNavigate }) => {
+const CreateTournamentPage = () => {
+    const navigate = useNavigate();
     const [name, setName] = useState('');
     const [gameName, setGameName] = useState('Clash of Clans');
     const [startDate, setStartDate] = useState('');
@@ -60,7 +63,7 @@ const CreateTournamentPage = ({ onNavigate }) => {
         try {
             await tournamentService.createTournament(tournamentData);
             setSuccess('Tournament created successfully!');
-            setTimeout(() => onNavigate('tournaments'), 2000);
+            setTimeout(() => navigate('/tournaments'), 2000);
         } catch (err) {
             setError('Failed to create tournament. Please check the details and try again.');
             console.error(err);
@@ -91,6 +94,7 @@ const CreateTournamentPage = ({ onNavigate }) => {
                         </div>
                     </div>
 
+                    {/* Registration Fields Section */}
                     <div className="border-t border-gray-700 pt-6">
                         <h3 className="text-xl font-semibold text-white mb-4">Registration Form Fields</h3>
                         <div className="space-y-4">
@@ -123,3 +127,4 @@ const CreateTournamentPage = ({ onNavigate }) => {
 };
 
 export default CreateTournamentPage;
+

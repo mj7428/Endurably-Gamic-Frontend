@@ -25,6 +25,13 @@ const createTournament = (tournamentData) => {
   });
 };
 
+const patchTournament = (tournamentId, updateData) => {
+    console.log('reached to update');
+    return axios.patch(`${API_BASE_URL}/tournaments/${tournamentId}`, updateData, {
+        headers: getAuthHeaders(), 
+    });
+};
+
 const getTournamentById = (id) => {
   return axios.get(`${API_BASE_URL}/tournaments/${id}`, {
     headers: getAuthHeaders(),
@@ -68,6 +75,7 @@ const declareWinner = (tournamentId, roundNumber, matchNumber, data) => {
 const tournamentService = {
   getAllTournaments,
   createTournament,
+  patchTournament,
   getTournamentById, 
   registerTeam,     
   getRegistrationsForTournament,

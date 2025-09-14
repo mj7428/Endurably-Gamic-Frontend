@@ -1,65 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import tournamentService from '../services/tournamentService'; 
 import { useAuth } from '../context/AuthContext'; 
 import RelevantVideos from './RelevantVideos';
 
-// A component to display the user's existing registration details
 const RegistrationDetails = ({ registration }) => (
-    <div className="bg-red-900/50 border border-red-700 p-6 rounded-lg">
-        <h4 className="text-xl font-bold text-red-300 mb-4">You Are Registered!</h4>
+    <div className="bg-green-900/50 border border-green-700 p-6 rounded-lg">
+        <h4 className="text-xl font-bold text-green-300 mb-4">You Are Registered!</h4>
         <p className="text-gray-300 mb-4">Here are the details you submitted:</p>
         
         <div className="space-y-4">
-            {/* Team Details */}
             <div>
                 <h5 className="font-semibold text-gray-200 mb-2">Team Details</h5>
-                <div className="pl-4 border-l-2 border-red-500 space-y-1 text-sm">
+                <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
                     {registration.teamFields.map(field => (
                         <p key={field.fieldName}><span className="text-gray-400">{field.fieldName}:</span> {field.value}</p>
                     ))}
                 </div>
             </div>
 
-            {/* Player Details */}
             {registration.playerSubmissions.map((player, index) => (
-                 <div key={player.playerSubmissionId}>
-                    <h5 className="font-semibold text-gray-200 mb-2 mt-3">Player {index + 1}</h5>
-                    <div className="pl-4 border-l-2 border-red-500 space-y-1 text-sm">
-                        {player.fieldValues.map(field => (
-                            <p key={field.fieldName}><span className="text-gray-400">{field.fieldName.replace(`Player ${index + 1} `, '')}:</span> {field.value}</p>
-                        ))}
-                    </div>
-                </div>
+               <div key={player.playerSubmissionId}>
+                   <h5 className="font-semibold text-gray-200 mb-2 mt-3">Player {index + 1}</h5>
+                   <div className="pl-4 border-l-2 border-green-500 space-y-1 text-sm">
+                       {player.fieldValues.map(field => (
+                           <p key={field.fieldName}><span className="text-gray-400">{field.fieldName.replace(`Player ${index + 1} `, '')}:</span> {field.value}</p>
+                       ))}
+                   </div>
+               </div>
             ))}
         </div>
     </div>
 );
 
 
-const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
+const TournamentDetailPage = () => {
+    const { tournamentId } = useParams();
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [tournament, setTournament] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const isAdmin = user && user.roles.includes('ROLE_ADMIN');
     
     const [formValues, setFormValues] = useState({});
 
-    const fetchTournament = async () => {
+    const fetchTournament = useCallback(async () => {
         try {
             setLoading(true);
             const response = await tournamentService.getTournamentById(tournamentId);
             setTournament(response.data);
         } catch (err) {
             setError('Failed to load tournament details.');
+            console.error(err);
         } finally {
             setLoading(false);
         }
-    };
+    }, [tournamentId]);
 
     useEffect(() => {
-        fetchTournament();
+        if(tournamentId) {
+            fetchTournament();
+        }
     }, [tournamentId, success]); 
 
 
@@ -79,18 +81,19 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         };
         const playersMap = {};
 
-        // ✅ This logic is now corrected to build the proper payload
+        let validationError = false;
         tournament.requiredFields.forEach(field => {
+            if (validationError) return;
             const value = formValues[field.id];
             if (!value && field.isRequired) {
                 setError(`Field "${field.fieldName}" is required.`);
+                validationError = true;
                 return;
             }
             if (!value) return;
 
-            // Create the object with fieldName and value
             const fieldValue = {
-                fieldName: field.fieldName, // The crucial fix
+                fieldName: field.fieldName,
                 value: value
             };
 
@@ -107,7 +110,7 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             }
         });
         
-        if(error) {
+        if(validationError) {
             setLoading(false);
             return;
         }
@@ -120,7 +123,6 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
         } catch (err) {
             const errorMsg = err.response?.data?.messages?.join(', ') || 'Registration failed. Please check your details.';
             setError(errorMsg);
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -146,10 +148,10 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
 
     if (loading && !tournament) return <p className="text-center text-xl p-8">Loading Tournament...</p>;
     if (error && !tournament) return <p className="text-center text-xl text-red-500 p-8">{error}</p>;
+    if (!tournament) return null;
 
-    const isTournamentFinished = tournament && new Date(tournament.startDate) < new Date();
+    const isRegistrationOver = new Date(tournament.startDate) < new Date();
     const { teamFields, playerFields } = getGroupedFields();
-
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -165,12 +167,12 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                 {!user ? (
                     <div className="text-center text-gray-400 border border-dashed border-gray-600 p-8 rounded-lg">
                         <p>You must be logged in to register for this tournament.</p>
-                        <button onClick={() => onNavigate('login')} className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                        <button onClick={() => navigate('/login')} className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
                             Login
                         </button>
                     </div>
-                ) : isTournamentFinished ? (
-                    <div className="text-center text-yellow-400 bg-yellow-900/50 border border-yellow-700 p-8 rounded-lg">
+                ) : isRegistrationOver ? (
+                    <div className="text-center text-red-400 bg-red-900/50 border border-red-700 p-8 rounded-lg">
                         <p className="font-bold text-lg">Registrations for this tournament have closed.</p>
                     </div>
                 ) : tournament.userRegistration ? (
@@ -203,17 +205,17 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {playerGroup.fields.map(field => (
                                          <div key={field.id}>
-                                            <label htmlFor={`field-${field.id}`} className="block text-sm font-medium text-gray-300">
-                                                {field.fieldName.replace(`Player ${playerGroup.playerNumber} `, '')} {field.isRequired && <span className="text-red-500">*</span>}
-                                            </label>
-                                            <input
-                                                id={`field-${field.id}`}
-                                                type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
-                                                onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                                required={field.isRequired}
-                                                className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition"
-                                            />
-                                        </div>
+                                             <label htmlFor={`field-${field.id}`} className="block text-sm font-medium text-gray-300">
+                                                 {field.fieldName.replace(`Player ${playerGroup.playerNumber} `, '')} {field.isRequired && <span className="text-red-500">*</span>}
+                                             </label>
+                                             <input
+                                                 id={`field-${field.id}`}
+                                                 type={field.fieldType === 'NUMBER' ? 'number' : 'text'}
+                                                 onChange={(e) => handleInputChange(field.id, e.target.value)}
+                                                 required={field.isRequired}
+                                                 className="mt-1 w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition"
+                                             />
+                                         </div>
                                     ))}
                                 </div>
                             </div>
@@ -229,10 +231,11 @@ const TournamentDetailPage = ({ tournamentId, onNavigate }) => {
             </div>
             <RelevantVideos 
                 searchTerm={tournament.name} 
-                title="Tournament Winners" 
+                title="Tournament Highlights" 
             />
         </div>
     );
 };
 
 export default TournamentDetailPage;
+

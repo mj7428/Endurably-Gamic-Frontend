@@ -1,7 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Navbar from './components/Navbar';
-import Header from './components/Header';
-import BaseLayoutGrid from './components/BaseLayoutGrid';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Import Layout and Route Protection
+import Layout from './components/Layout';
+import { PrivateRoute, AdminRoute } from './components/ProtectedRoutes';
+
+// Import Page Components
+import HomePage from './Home';
 import Login from './components/Login';
 import Register from './components/Register';
 import SubmitBase from './components/SubmitBase';
@@ -9,156 +14,60 @@ import TournamentsPage from './components/TournamentsPage';
 import CreateTournamentPage from './components/CreateTournamentPage';
 import TournamentDetailPage from './components/TournamentDetailPage';
 import TournamentRegistrationsPage from './components/TournamentRegistrationsPage';
-import { useAuth } from './context/AuthContext';
-import baseLayoutService from './services/baseLayoutService';
-import Footer from './components/Footer';
-import { PrivacyPolicyPage, TermsOfServicePage } from './components/LegalPages';
 import TournamentBracketPage from './components/TournamentBracketPage';
-import RelevantVideos from './components/RelevantVideos';
-import RecentVideos from './components/RecentVideos';
+import { PrivacyPolicyPage, TermsOfServicePage } from './components/LegalPages';
+import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler';
+import MartHomePage from './mart/components/MartHomePage';
+import MartLayout from './mart/components/MartLayout';
+import CartPage from './mart/pages/CartPage';
+import CheckoutSuccessPage from './mart/pages/CheckoutSuccessPage';
+import OrderHistoryPage from './mart/pages/OrderHistoryPage';
+import CheckoutPage from './mart/pages/CheckoutPage';
+import AdminDashboardPage from './mart/pages/AdminDashboardPage';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-  const { user, login, logout } = useAuth(); 
-  const [activeTournamentId, setActiveTournamentId] = useState(null);
-  const [layouts, setLayouts] = useState([]);
-  const [activeTownHall, setActiveTownHall] = useState(15);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const observer = useRef();
-  const lastBaseElementRef = useCallback(node => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage(prevPage => prevPage + 1);
-      }
-    });
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore]);
-
-  useEffect(() => {
-    if (currentPage !== 'home') return;
-    setLayouts([]);
-    setPage(0);
-    setHasMore(true);
-    
-    const fetchInitialLayouts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await baseLayoutService.getAll({ page: 0, size: 8 }, activeTownHall);
-        setLayouts(response.data.content);
-        setHasMore(!response.data.last);
-      } catch (err) {
-        setError('Failed to fetch base layouts. Is the server running?');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchInitialLayouts();
-  }, [activeTownHall, currentPage]);
-
-  useEffect(() => {
-    if (page === 0 || currentPage !== 'home' || !hasMore) return;
-
-    const fetchMoreLayouts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await baseLayoutService.getAll({ page, size: 8 }, activeTownHall);
-        setLayouts(prevLayouts => [...prevLayouts, ...response.data.content]);
-        setHasMore(!response.data.last);
-      } catch (err) {
-        setError('Failed to fetch base layouts. Is the server running?');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchMoreLayouts();
-  }, [page]); 
-
-  const handleLoginSuccess = () => { login(); setCurrentPage('home'); };
-  const handleLogout = () => { logout(); setCurrentPage('home'); };
-  const navigateTo = (page) => { setActiveTournamentId(null); setCurrentPage(page); };
-
-  const switchTournamentView = (page) => {
-    setCurrentPage(page);
-  };
-
-  const viewTournamentDetails = (tournament) => { // Pass the whole tournament object
-  setActiveTournamentId(tournament.id);
-  
-  if (user && user.roles.includes('ROLE_ADMIN')) {
-    // Admins see registrations if they are open, otherwise the bracket
-    if (tournament.status === 'REGISTRATION_OPEN') {
-        setCurrentPage('view-registrations');
-    } else {
-        setCurrentPage('tournament-bracket'); // New page for bracket
-    }
-  } else {
-      // Users see the detail/registration page if open, otherwise the bracket
-      if (tournament.status === 'REGISTRATION_OPEN') {
-          setCurrentPage('tournament-detail');
-      } else {
-          setCurrentPage('tournament-bracket'); // New page for bracket
-      }
-    }
-  };
-
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'login': return <Login onLoginSuccess={handleLoginSuccess} onNavigate={navigateTo} />;
-      case 'register': return <Register onNavigate={navigateTo} />;
-      case 'submit': return <SubmitBase />;
-      case 'tournaments': return <TournamentsPage onNavigate={navigateTo} onViewDetails={viewTournamentDetails} />;
-      case 'tournament-bracket': return <TournamentBracketPage tournamentId={activeTournamentId} />;
-      case 'create-tournament': return <CreateTournamentPage onNavigate={navigateTo}/>;
-      case 'tournament-detail': return <TournamentDetailPage tournamentId={activeTournamentId} onNavigate={navigateTo} />;
-      case 'view-registrations':  return <TournamentRegistrationsPage tournamentId={activeTournamentId} onNavigate={switchTournamentView} />;
-      case 'terms': return <TermsOfServicePage />;
-      case 'privacy': return <PrivacyPolicyPage />;
-      default:
-        return (
-          <>
-            <Header activeTownHall={activeTownHall} setActiveTownHall={setActiveTownHall} />
-            <main className="container mx-auto px-2 sm:px-4 py-8">
-              <BaseLayoutGrid 
-                layouts={layouts} 
-                loading={loading} 
-                error={error} 
-                lastBaseElementRef={lastBaseElementRef}
-              />
-              <RelevantVideos 
-                searchTerm={`TH${activeTownHall} Attack Strategy`} 
-                title={`TH${activeTownHall} Attack Strategies`}
-              />
-              <RecentVideos />
-               {error && <div>{error}</div>}
-            </main>
-          </>
-        );
-    }
-  };
-
   return (
-    <div className="bg-gray-900 min-h-screen text-gray-200 font-sans">
-      <Navbar 
-        onLogout={handleLogout}
-        onNavigate={navigateTo} 
-      />
-      {renderPage()}
-      <Footer onNavigate={navigateTo} />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/mart/*" element={<MartLayout />}>
+            <Route index element={<MartHomePage />} />
+            {/* You can add other mart-specific routes here in the future */}
+            <Route element={<PrivateRoute />}>
+              <Route path="cart" element={<CartPage />} />
+              <Route path="order-success" element={<CheckoutSuccessPage />} />
+              <Route path="my-orders" element={<OrderHistoryPage />} />
+              <Route path="checkout" element={<CheckoutPage />} />
+            </Route>
+        </Route>
+
+        <Route path="/" element={<Layout />}>
+          {/* Public Routes */}
+          <Route index element={<HomePage />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="terms" element={<TermsOfServicePage />} />
+          <Route path="privacy" element={<PrivacyPolicyPage />} />
+          <Route path="tournaments" element={<TournamentsPage />} />
+          <Route path="tournaments/:tournamentId" element={<TournamentDetailPage />} />
+          <Route path="tournaments/:tournamentId/bracket" element={<TournamentBracketPage />} />
+          <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+
+          {/* User Protected Routes */}
+          <Route element={<PrivateRoute />}>
+            <Route path="submit" element={<SubmitBase />} />
+          </Route>
+
+          {/* Admin Protected Routes */}
+          <Route element={<AdminRoute />}>
+            <Route path="tournaments/create" element={<CreateTournamentPage />} />
+            <Route path="tournaments/:tournamentId/registrations" element={<TournamentRegistrationsPage />} />
+            <Route path="admin-review" element={<AdminDashboardPage />} /> 
+          </Route>
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+

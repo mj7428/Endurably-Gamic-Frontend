@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/authService';
 import registerImage from '../assets/registerfor.png';
 
-const Register = ({ onNavigate }) => {
+const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -20,7 +22,7 @@ const Register = ({ onNavigate }) => {
             await authService.register(name, email, password);
             setSuccess('Registration successful! Redirecting to login...');
             setTimeout(() => {
-                onNavigate('login');
+                navigate('/login');
             }, 2000);
         } catch (err) {
             const errorMsg = err.response?.data?.messages?.join(', ') || 'Registration failed. Please try again.';
@@ -86,13 +88,12 @@ const Register = ({ onNavigate }) => {
 
                         <div className="text-center text-sm text-gray-400">
                             Already have an account?{' '}
-                            <button 
-                                type="button" 
-                                onClick={() => onNavigate('login')} 
+                            <Link 
+                                to="/login" 
                                 className="font-medium text-red-400 hover:underline"
                             >
                                 Log In
-                            </button>
+                            </Link>
                         </div>
                     </form>
                 </div>
@@ -110,3 +111,4 @@ const Register = ({ onNavigate }) => {
 };
 
 export default Register;
+

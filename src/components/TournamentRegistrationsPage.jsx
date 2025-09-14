@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import tournamentService from '../services/tournamentService';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,7 +44,9 @@ const TeamRegistrationCard = ({ registration }) => {
 };
 
 
-const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
+const TournamentRegistrationsPage = () => {
+    const { tournamentId } = useParams();
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [tournament, setTournament] = useState(null);
     const [registrations, setRegistrations] = useState([]);
@@ -68,7 +71,9 @@ const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
     };
 
     useEffect(() => {
-        fetchPageData();
+        if (tournamentId) {
+            fetchPageData();
+        }
     }, [tournamentId]);
 
     const handleStartTournament = async () => {
@@ -78,7 +83,7 @@ const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
         setLoading(true);
         try {
             await tournamentService.startTournament(tournamentId);
-            onNavigate('tournament-bracket');
+            navigate(`/tournaments/${tournamentId}/bracket`);
         } catch (err) {
             setError(err.response?.data || 'Failed to start tournament.');
             setLoading(false);
@@ -96,7 +101,6 @@ const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
             <h2 className="text-3xl font-bold text-center mb-2 text-white">{tournament.name} Registrations</h2>
             <p className="text-center text-gray-400 mb-8">Status: <span className="font-semibold text-yellow-400">{tournament.status.replace('_', ' ')}</span></p>
 
-            {/* ADMIN ACTION SECTION */}
             {isAdmin && isRegistrationOpen && (
                 <div className="mb-8 p-4 bg-red-900/20 border border-red-700 rounded-lg text-center">
                     <h4 className="font-bold text-lg text-white">Admin Action</h4>
@@ -137,3 +141,4 @@ const TournamentRegistrationsPage = ({ tournamentId, onNavigate }) => {
 };
 
 export default TournamentRegistrationsPage;
+

@@ -1,24 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom'; // ✅ IMPORT useParams
 import Confetti from 'react-confetti';
 import tournamentService from '../services/tournamentService';
 import { useAuth } from '../context/AuthContext';
 
-// ============================================================================
-// Redesigned component to display the tournament winner
-// ============================================================================
+// (The TournamentWinnerBanner and MatchCard components remain the same)
+
 const TournamentWinnerBanner = ({ winnerTeam, prizePool }) => {
     if (!winnerTeam) return null;
-
     const getTeamName = (team) => {
         const nameField = team.teamFields.find(f => f.fieldName.toLowerCase().includes('name'));
         return nameField ? nameField.value : 'Unnamed Team';
     };
-
     return (
         <div className="mb-8 p-6 bg-gray-800 border border-red-500 rounded-xl shadow-2xl text-center relative overflow-hidden">
-            {/* Background Glow Effect */}
             <div className="absolute -top-1/2 -left-1/2 w-[200%] h-[200%] bg-gradient-to-r from-red-500/30 via-transparent to-red-500/30 animate-spin-slow"></div>
-            
             <div className="relative z-10">
                 <div className="flex justify-center items-center mb-3">
                     <span className="text-5xl mr-4">🏆</span>
@@ -37,11 +33,6 @@ const TournamentWinnerBanner = ({ winnerTeam, prizePool }) => {
     );
 };
 
-
-
-// ============================================================================
-// MatchCard Component
-// ============================================================================
 const MatchCard = ({ match, onDeclareWinner }) => {
     const { user } = useAuth();
     const isAdmin = user && user.roles.includes('ROLE_ADMIN');
@@ -52,12 +43,18 @@ const MatchCard = ({ match, onDeclareWinner }) => {
         return nameField ? nameField.value : 'Unnamed Team';
     };
 
+    const handleWinnerClick = (team) => {
+        if (window.confirm(`Are you sure you want to declare "${getTeamName(team)}" as the winner?`)) {
+            onDeclareWinner(match, team.registrationId);
+        }
+    };
+
     const renderTeam = (team, isWinner) => (
         <div className={`flex items-center justify-between p-2 rounded ${isWinner ? 'bg-green-500/20 font-bold text-white' : 'bg-gray-700'}`}>
             <span className="truncate">{getTeamName(team)}</span>
             {isAdmin && !match.winner && team && match.status !== 'COMPLETED' && (
                  <button 
-                    onClick={() => onDeclareWinner(match, team.registrationId)}
+                    onClick={() => handleWinnerClick(team)}
                     className="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded ml-2 flex-shrink-0"
                  >
                      Set Winner
@@ -68,7 +65,7 @@ const MatchCard = ({ match, onDeclareWinner }) => {
 
     return (
         <div className="bg-gray-800 rounded-lg p-3 w-64 flex-shrink-0 border border-gray-700">
-            <p className="text-xs text-gray-500 mb-2">Match {match.matchNumber}</p>
+            <p className="text-xs text-gray-500 mb-2">Round {match.roundNumber} - Match {match.matchNumber}</p>
             <div className="space-y-2">
                 {renderTeam(match.teamA, match.winner && match.winner.registrationId === match.teamA?.registrationId)}
                 <div className="text-center text-gray-500 text-sm font-bold">VS</div>
@@ -79,10 +76,10 @@ const MatchCard = ({ match, onDeclareWinner }) => {
 };
 
 
-// ============================================================================
-// Main TournamentBracketPage Component
-// ============================================================================
-const TournamentBracketPage = ({ tournamentId }) => {
+const TournamentBracketPage = () => {
+    // ✅ GET the tournamentId from the URL using the useParams hook
+    const { tournamentId } = useParams(); 
+
     const [tournament, setTournament] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -98,26 +95,25 @@ const TournamentBracketPage = ({ tournamentId }) => {
             if (!tournament) setLoading(true);
             const response = await tournamentService.getTournamentById(tournamentId);
             setTournament(response.data);
-            
         } catch (err) {
             setError('Failed to load tournament details.');
             console.error(err);
         } finally {
             setLoading(false);
         }
-    }, [tournamentId]);
+    }, [tournamentId, tournament]);
 
     useEffect(() => {
         fetchTournamentData();
     }, [fetchTournamentData]);
-
+    
     const handleDeclareWinner = async (match, winnerTeamId) => {
         try {
-            await tournamentService.declareWinner(tournament.id, match.roundNumber, match.matchNumber, { winnerTeamId });
+            await tournamentService.declareWinner(tournamentId, match.roundNumber, match.matchNumber, { winnerTeamId });
             fetchTournamentData(); 
         } catch (err) {
             console.error("Failed to declare winner", err);
-            setError(err.response?.data || 'An error occurred while declaring the winner.');
+            setError(err.response?.data?.messages?.join(', ') || 'An error occurred while declaring the winner.');
         }
     };
     
@@ -167,7 +163,7 @@ const TournamentBracketPage = ({ tournamentId }) => {
                     <div key={roundNumber} className="flex flex-col items-center flex-shrink-0">
                         <h3 className="text-xl font-bold text-white mb-4">Round {roundNumber}</h3>
                         <div className="space-y-4">
-                            {matches.map(match => (
+                            {matches.sort((a, b) => a.matchNumber - b.matchNumber).map(match => (
                                 <MatchCard 
                                     key={`${match.roundNumber}-${match.matchNumber}`} 
                                     match={match} 
