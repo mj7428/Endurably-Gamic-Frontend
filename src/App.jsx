@@ -24,6 +24,7 @@ import CheckoutSuccessPage from './mart/pages/CheckoutSuccessPage';
 import OrderHistoryPage from './mart/pages/OrderHistoryPage';
 import CheckoutPage from './mart/pages/CheckoutPage';
 import AdminDashboardPage from './mart/pages/AdminDashboardPage';
+import ItemDetailPage from './mart/pages/ItemDetailPage';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
               <Route path="order-success" element={<CheckoutSuccessPage />} />
               <Route path="my-orders" element={<OrderHistoryPage />} />
               <Route path="checkout" element={<CheckoutPage />} />
+              <Route path="items/:itemId" element={<ItemDetailPage />} />
             </Route>
         </Route>
 

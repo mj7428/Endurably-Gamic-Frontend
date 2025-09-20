@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import PaymentForm from '../components/PaymentForm';
 import AddAddressModal from '../components/AddAddressModal';
 
+
 const CheckoutPage = () => {
     const { cart, fetchCart } = useAuth();
     const navigate = useNavigate();
@@ -71,13 +72,12 @@ const CheckoutPage = () => {
             <div className="container mx-auto px-4 py-8 text-center">
                 <h2 className="text-3xl font-bold text-white mb-4">Your Cart is Empty</h2>
                 <p className="text-gray-400 mb-6">Start shopping to proceed to checkout.</p>
-                 <Link to="/mart" className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700">
+                <Link to="/mart" className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700">
                     Continue Shopping
                 </Link>
             </div>
         );
     }
-
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -94,6 +94,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="bg-gray-800 p-8 rounded-lg">
+                    {/* Step 1: Address */}
                     {step === 1 && (
                         <div>
                             <h2 className="text-xl font-bold text-white mb-4">Shipping Address</h2>
@@ -112,6 +113,7 @@ const CheckoutPage = () => {
                             <button onClick={() => setStep(2)} disabled={!selectedAddress} className="w-full mt-6 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 disabled:bg-gray-600">Next: Payment</button>
                         </div>
                     )}
+                    {/* Step 2: Payment */}
                     {step === 2 && (
                         <div>
                             <PaymentForm 
@@ -124,24 +126,56 @@ const CheckoutPage = () => {
                             </div>
                         </div>
                     )}
+                    {/* Step 3: Review */}
                     {step === 3 && (
                          <div>
                             <h2 className="text-xl font-bold text-white mb-4">3. Review Order</h2>
-                            <div className="border-b border-gray-700 pb-4 mb-4">
-                                <h4 className="font-semibold text-gray-300">Shipping To:</h4>
-                                <p>{selectedAddress?.street}, {selectedAddress?.city}</p>
-                            </div>
-                            <div className="border-b border-gray-700 pb-4 mb-4">
-                                <h4 className="font-semibold text-gray-300">Payment Method:</h4>
-                                <p>{paymentDetails?.method.replace(/([A-Z])/g, ' $1').trim()}</p>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-gray-300 mb-2">Items:</h4>
-                                <div className="space-y-2">
-                                {cart.items.map(ci => <p key={ci.item.id} className="text-sm">{ci.item.name} x {ci.quantity}</p>)}
+                            <div className="space-y-4">
+                                <div className="border-b border-gray-700 pb-4">
+                                    <h4 className="font-semibold text-gray-300">Shipping To:</h4>
+                                    <p>{selectedAddress?.street}, {selectedAddress?.city}</p>
                                 </div>
-                                <p className="text-lg font-bold mt-4 pt-4 border-t border-gray-700">Total: ₹{cart.totalPrice.toFixed(2)}</p>
+                                <div className="border-b border-gray-700 pb-4">
+                                    <h4 className="font-semibold text-gray-300">Payment Method:</h4>
+                                    <p>{paymentDetails?.method.replace(/([A-Z])/g, ' $1').trim()}</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-gray-300 mb-2">Items:</h4>
+                                    <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+                                        {cart.items.map(ci => (
+                                            <div key={ci.item.id} className="flex justify-between text-sm">
+                                                <p>{ci.item.name} x {ci.quantity}</p>
+                                                <p>₹{(ci.item.price * ci.quantity).toFixed(2)}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                
+                                {/* ✅ THIS IS THE FIX: The full, professional price breakdown */}
+                                <div className="pt-4 border-t border-gray-700 space-y-2">
+                                    <div className="flex justify-between text-gray-300">
+                                        <span>Subtotal</span>
+                                        <span>₹{cart.originalSubtotal.toFixed(2)}</span>
+                                    </div>
+                                     {cart.productDiscount > 0 && (
+                                        <div className="flex justify-between text-green-400">
+                                            <span>Product Discounts</span>
+                                            <span>- ₹{cart.productDiscount.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    {cart.couponDiscount > 0 && (
+                                        <div className="flex justify-between text-green-400">
+                                            <span>Coupon Discount</span>
+                                            <span>- ₹{cart.couponDiscount.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between font-bold text-white text-lg pt-2 border-t border-gray-600">
+                                        <span>Grand Total</span>
+                                        <span>₹{cart.finalTotal.toFixed(2)}</span>
+                                    </div>
+                                </div>
                             </div>
+                            
                             {error && <p className="text-red-400 text-center my-4">{error}</p>}
                             <div className="flex justify-between mt-6">
                                  <button onClick={() => setStep(2)} className="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700">Back</button>

@@ -61,7 +61,13 @@ export const AuthProvider = ({ children }) => {
         setCart(null);
     };
 
-    const value = { user, cart,  login, logout, loginWithToken, fetchCart, setCart};
+    const applyCouponToCart = async (code) => {
+      const response = await martService.applyCoupon(code); 
+      setCart(response.data); 
+      return { success: true };
+    };
+
+    const value = { user, cart,  login, logout, loginWithToken, fetchCart, setCart, applyCouponToCart};
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

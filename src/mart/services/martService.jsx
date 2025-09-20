@@ -20,30 +20,28 @@ const createCategory = (categoryData) => {
     });
 };
 
-const createItem = async (itemData) => {
+const uploadImage = (imageFile) => {
+    const formData = new FormData();
+    formData.append('file', imageFile); 
+    
     const IMAGE_UPLOAD_API_URL = "https://0wfcf7x5t9.execute-api.ap-south-1.amazonaws.com/prod/upload";
 
-  
-   try {
-        const imageFormData = new FormData();
-        imageFormData.append('file', itemData.imageFile);
+    return axios.post(IMAGE_UPLOAD_API_URL, formData, {
+        headers: {
+            ...getAuthHeaders()
+        },
+    });
+};
 
-        const uploadResponse = await axios.post(IMAGE_UPLOAD_API_URL, imageFormData, {
-            headers: {
-                ...getAuthHeaders(),
-            },
-        });
+const getItemById = (itemId) => {
+    return axios.get(`${API_BASE_URL}/api/mart/items/${itemId}`);
+};
 
-        const imageUrl = uploadResponse.data.imageUrl;
-        const { imageFile, ...dataToSend } = itemData;
-        dataToSend.imageUrl = imageUrl;
-
-        return axios.post(`${API_BASE_URL}/api/mart/items`, dataToSend, {
-            headers: getAuthHeaders(),
-        });
-    } catch (error) {
-    throw error;
-  }
+// This function now only handles creating the item with final data
+const createItem = (itemData) => {
+    return axios.post(`${API_BASE_URL}/api/mart/items`, itemData, {
+        headers: getAuthHeaders(),
+    });
 };
 
 const getItemsByCategory = (categoryId, pageable) => {
@@ -74,6 +72,24 @@ const removeItemFromCart = (itemId) => {
     return axios.delete(`${API_BASE_URL}/api/cart/items/${itemId}`, { headers: getAuthHeaders() });
 };
 
+const updateItemQuantityFromCart = (itemId, quantity) => {
+    return axios.patch(`${API_BASE_URL}/api/cart/items`, { itemId, quantity }, { headers: getAuthHeaders() });
+};
+
+const applyCoupon = (code) => {
+    return axios.post(`${API_BASE_URL}/api/cart/apply-coupon`, { code }, { headers: getAuthHeaders() });
+};
+
+// ✅ NEW: Function to get all available offers for the current cart
+const discoverCoupons = () => {
+    return axios.get(`${API_BASE_URL}/api/cart/discover-coupons`, { headers: getAuthHeaders() });
+};
+
+// ✅ NEW: Function to remove a manually applied coupon
+const removeCoupon = () => {
+    return axios.delete(`${API_BASE_URL}/api/cart/apply-coupon`, { headers: getAuthHeaders() });
+};
+
 const createOrderFromCart = () => {
     return axios.post(`${API_BASE_URL}/api/orders`, {}, { headers: getAuthHeaders() });
 };
@@ -102,10 +118,16 @@ const martService = {
     getItemsByCategory,
     createCategory,
     createItem,
+    uploadImage,
+    getItemById,
     getAllItems,
     getCart,
     addItemToCart,
     removeItemFromCart,
+    updateItemQuantityFromCart,
+    applyCoupon,
+    removeCoupon,
+    discoverCoupons,
     createOrderFromCart,
     getOrderHistory,
     getAddresses,
