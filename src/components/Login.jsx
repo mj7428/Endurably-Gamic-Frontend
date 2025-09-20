@@ -28,7 +28,7 @@ const Login = () => {
         }
     };
 
-    const API_BASE_URL_BACKEND = "https://np8fl1g1xc.execute-api.ap-south-1.amazonaws.com/prod/oauth2/authorization/google"
+    const API_BASE_URL_BACKEND = "https://np8fl1g1xc.execute-api.ap-south-1.amazonaws.com/prod"
     const googleLoginUrl = `${API_BASE_URL_BACKEND}/oauth2/authorization/google`;
 
     return (
