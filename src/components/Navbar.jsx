@@ -45,7 +45,7 @@ const Navbar = () => {
         <nav className="bg-gray-800 border-b-2 border-red-600 p-4 shadow-lg sticky top-0 z-50">
             <div className="container mx-auto flex justify-between items-center">
               {/* This section has nested Links, which is not ideal. Let's fix it to one NavLink */}
-              <NavLink to="/" className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-300">
+              <NavLink to="/mart" className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-300">
                   <GameIcon />
                   <span className="hidden sm:block text-xl sm:text-2xl font-bold text-white font-display tracking-wider">
                       ENDURABLY GAMIC
